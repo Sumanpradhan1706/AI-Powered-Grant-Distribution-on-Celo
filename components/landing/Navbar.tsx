@@ -27,6 +27,9 @@ export default function Navbar() {
             <Link href="/dashboard" className="text-gray-300 hover:text-white transition-colors">
               Dashboard
             </Link>
+            <Link href="/company" className="text-purple-400 hover:text-purple-300 transition-colors font-semibold">
+              Company Voting
+            </Link>
             <Link href="/admin" className="text-blue-400 hover:text-blue-300 transition-colors font-semibold">
               Admin
             </Link>
