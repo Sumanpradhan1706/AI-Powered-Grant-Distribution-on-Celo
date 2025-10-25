@@ -29,7 +29,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { projectAddress, name, description, githubUrl } = body;
+    const { projectAddress, name, description, githubUrl, blockchainTxHash, blockchainProjectId, aiScore } = body;
 
     if (!projectAddress || !name || !githubUrl) {
       return NextResponse.json(
@@ -46,7 +46,9 @@ export async function POST(request: NextRequest) {
           name,
           description,
           github_url: githubUrl,
-          impact_score: 0,
+          blockchain_tx_hash: blockchainTxHash || null,
+          blockchain_project_id: blockchainProjectId !== undefined ? blockchainProjectId : null,
+          impact_score: aiScore || 0,
           total_grants_received: 0,
           is_active: true,
           is_verified: false,
