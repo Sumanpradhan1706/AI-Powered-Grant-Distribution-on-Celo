@@ -1,16 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
- * @title GrantDistribution
- * @dev Voting-Based Grant Distribution on Celo
+ * @title GrantDistribution (Native CELO Version)
+ * @dev Voting-Based Grant Distribution on Celo using native CELO
  * @notice Smart contract where companies vote on project grant proposals
  */
-contract GrantDistribution is Ownable, ReentrancyGuard {
+contract GrantDistributionCELO is Ownable, ReentrancyGuard {
     
     // Structs
     struct Company {
@@ -61,9 +60,7 @@ contract GrantDistribution is Ownable, ReentrancyGuard {
     
     uint256 public projectCount;
     uint256 public totalDistributed;
-    uint256 public majorityThreshold = 3; // Need 3 out of 5 votes
-    
-    address public cUSDToken;
+    uint256 public majorityThreshold = 3;
     
     // Events
     event CompanyRegistered(
@@ -107,7 +104,7 @@ contract GrantDistribution is Ownable, ReentrancyGuard {
         uint256 timestamp
     );
     
-    event TreasuryDeposit(address indexed from, uint256 amount, address token);
+    event TreasuryDeposit(address indexed from, uint256 amount);
     
     // Modifiers
     modifier onlyCompany() {
@@ -120,9 +117,7 @@ contract GrantDistribution is Ownable, ReentrancyGuard {
         _;
     }
     
-    constructor(address _cUSDToken) Ownable(msg.sender) {
-        cUSDToken = _cUSDToken;
-    }
+    constructor() Ownable(msg.sender) {}
     
     /**
      * @dev Register a new company (only owner can do this)
@@ -164,7 +159,6 @@ contract GrantDistribution is Ownable, ReentrancyGuard {
             address companyAddr = _companyAddresses[i];
             require(companies[companyAddr].isActive, "Company not registered");
             
-            // Avoid duplicate assignments
             if (!isProjectAssignedToCompany[_projectId][companyAddr]) {
                 projectAssignments[_projectId].push(companyAddr);
                 companyAssignedProjects[companyAddr].push(_projectId);
@@ -257,9 +251,9 @@ contract GrantDistribution is Ownable, ReentrancyGuard {
         
         emit VoteCast(_projectId, msg.sender, _support, block.timestamp);
         
-        // Check if majority reached (based on assigned companies, not all companies)
+        // Check if majority reached
         uint256 assignedCompanyCount = projectAssignments[_projectId].length;
-        uint256 requiredVotes = (assignedCompanyCount / 2) + 1; // Majority of assigned companies
+        uint256 requiredVotes = (assignedCompanyCount / 2) + 1;
         
         if (project.votesFor >= requiredVotes) {
             _approveAndFundProject(_projectId);
@@ -279,16 +273,13 @@ contract GrantDistribution is Ownable, ReentrancyGuard {
         
         emit ProjectApproved(_projectId, project.votesFor, project.votesAgainst, block.timestamp);
         
-        // Automatically distribute grant
-        IERC20 token = IERC20(cUSDToken);
-        uint256 contractBalance = token.balanceOf(address(this));
+        // Automatically distribute grant using native CELO
+        uint256 contractBalance = address(this).balance;
         
         require(contractBalance >= project.requestedAmount, "Insufficient treasury balance");
         
-        require(
-            token.transfer(project.projectAddress, project.requestedAmount),
-            "Transfer failed"
-        );
+        (bool success, ) = project.projectAddress.call{value: project.requestedAmount}("");
+        require(success, "Transfer failed");
         
         project.isFunded = true;
         project.totalGrantsReceived = project.requestedAmount;
@@ -303,16 +294,18 @@ contract GrantDistribution is Ownable, ReentrancyGuard {
     }
     
     /**
-     * @dev Deposit funds to treasury
+     * @dev Deposit native CELO to treasury
      */
-    function depositToTreasury(uint256 _amount) external {
-        IERC20 token = IERC20(cUSDToken);
-        require(
-            token.transferFrom(msg.sender, address(this), _amount),
-            "Transfer failed"
-        );
-        
-        emit TreasuryDeposit(msg.sender, _amount, cUSDToken);
+    function depositToTreasury() external payable {
+        require(msg.value > 0, "Must send CELO");
+        emit TreasuryDeposit(msg.sender, msg.value);
+    }
+    
+    /**
+     * @dev Allow contract to receive CELO
+     */
+    receive() external payable {
+        emit TreasuryDeposit(msg.sender, msg.value);
     }
     
     /**
@@ -373,19 +366,18 @@ contract GrantDistribution is Ownable, ReentrancyGuard {
     }
     
     /**
-     * @dev Get treasury balance
+     * @dev Get treasury balance (native CELO)
      */
     function getTreasuryBalance() external view returns (uint256) {
-        return IERC20(cUSDToken).balanceOf(address(this));
+        return address(this).balance;
     }
     
     /**
      * @dev Emergency withdraw (only owner)
      */
-    function emergencyWithdraw(address _token, uint256 _amount) 
-        external 
-        onlyOwner 
-    {
-        IERC20(_token).transfer(owner(), _amount);
+    function emergencyWithdraw(uint256 _amount) external onlyOwner {
+        require(_amount <= address(this).balance, "Insufficient balance");
+        (bool success, ) = owner().call{value: _amount}("");
+        require(success, "Withdraw failed");
     }
 }
