@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
-import { Shield, Zap, DollarSign, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
-import AIScoreManager from './AIScoreManager';
-import GrantDistributor from './GrantDistributor';
-import OracleSettings from './OracleSettings';
+import { Shield, Building2, AlertCircle, Wallet } from 'lucide-react';
+import CompanyManager from './CompanyManager';
+import TreasuryManagerCELO from './TreasuryManagerCELO';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function AdminPanel() {
@@ -84,36 +83,28 @@ export default function AdminPanel() {
                     <Shield className="w-8 h-8 text-blue-400" />
                     <h1 className="text-4xl font-bold text-white">Admin Panel</h1>
                 </div>
-                <p className="text-gray-400">Manage AI scoring, grant distribution, and system settings</p>
+                <p className="text-gray-400">Manage voting companies and treasury funds for grant distribution</p>
             </div>
 
-            {/* Admin Tabs */}
-            <Tabs defaultValue="scoring" className="space-y-6">
-                <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-grid bg-gray-800/50 border border-gray-700">
-                    <TabsTrigger value="scoring" className="flex items-center space-x-2">
-                        <Zap className="w-4 h-4" />
-                        <span>AI Scoring</span>
+            {/* Admin Content with Tabs */}
+            <Tabs defaultValue="treasury" className="space-y-6">
+                <TabsList className="bg-gray-800/50 border border-gray-700">
+                    <TabsTrigger value="treasury" className="data-[state=active]:bg-green-600">
+                        <Wallet className="w-4 h-4 mr-2" />
+                        Treasury
                     </TabsTrigger>
-                    <TabsTrigger value="grants" className="flex items-center space-x-2">
-                        <DollarSign className="w-4 h-4" />
-                        <span>Grant Distribution</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="settings" className="flex items-center space-x-2">
-                        <RefreshCw className="w-4 h-4" />
-                        <span>Oracle Settings</span>
+                    <TabsTrigger value="companies" className="data-[state=active]:bg-blue-600">
+                        <Building2 className="w-4 h-4 mr-2" />
+                        Companies & Projects
                     </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="scoring">
-                    <AIScoreManager />
+                <TabsContent value="treasury">
+                    <TreasuryManagerCELO />
                 </TabsContent>
 
-                <TabsContent value="grants">
-                    <GrantDistributor />
-                </TabsContent>
-
-                <TabsContent value="settings">
-                    <OracleSettings />
+                <TabsContent value="companies">
+                    <CompanyManager />
                 </TabsContent>
             </Tabs>
         </div>

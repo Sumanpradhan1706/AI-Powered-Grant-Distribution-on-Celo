@@ -6,7 +6,7 @@ import Footer from '@/components/landing/Footer';
 import ProjectLeaderboard from '@/components/dashboard/ProjectLeaderboard';
 import TreasuryBalance from '@/components/dashboard/TreasuryBalance';
 import FundingHistory from '@/components/dashboard/FundingHistory';
-import RegisterProject from '@/components/dashboard/RegisterProject';
+import ProjectProposal from '@/components/dashboard/ProjectProposal';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function DashboardPage() {
@@ -19,10 +19,10 @@ export default function DashboardPage() {
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-4xl font-bold text-white mb-2">
-              Grant Distribution Dashboard
+              Grant Proposal Dashboard
             </h1>
             <p className="text-gray-400">
-              Monitor projects, track funding, and manage grants powered by AI
+              Submit proposals and track company voting on blockchain
             </p>
           </div>
 
@@ -34,9 +34,9 @@ export default function DashboardPage() {
           {/* Main Content */}
           <Tabs defaultValue="leaderboard" className="space-y-6">
             <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-grid bg-gray-800/50 border border-gray-700">
-              <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
+              <TabsTrigger value="leaderboard">Projects</TabsTrigger>
               <TabsTrigger value="history">Funding History</TabsTrigger>
-              <TabsTrigger value="register">Register Project</TabsTrigger>
+              <TabsTrigger value="propose">Propose Project</TabsTrigger>
             </TabsList>
 
             <TabsContent value="leaderboard" className="space-y-6">
@@ -47,8 +47,8 @@ export default function DashboardPage() {
               <FundingHistory />
             </TabsContent>
 
-            <TabsContent value="register" className="space-y-6">
-              <RegisterProject />
+            <TabsContent value="propose" className="space-y-6">
+              <ProjectProposal />
             </TabsContent>
           </Tabs>
         </div>
