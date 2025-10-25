@@ -11,9 +11,23 @@ export async function GET() {
 
     if (error) throw error;
 
+    // Transform snake_case to camelCase for frontend
+    const transformedProjects = projects?.map((project: any) => ({
+      id: project.blockchain_project_id || project.id,
+      name: project.name,
+      description: project.description,
+      githubUrl: project.github_url,
+      requestedAmount: project.requested_amount || '0',
+      votesFor: project.votes_for || 0,
+      votesAgainst: project.votes_against || 0,
+      isApproved: project.is_approved || false,
+      isFunded: project.is_funded || false,
+      projectAddress: project.project_address,
+    })) || [];
+
     return NextResponse.json({
       success: true,
-      projects,
+      projects: transformedProjects,
     });
   } catch (error: any) {
     return NextResponse.json(
