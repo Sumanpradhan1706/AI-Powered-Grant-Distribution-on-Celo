@@ -10,6 +10,8 @@
     "compile": "cross-env TS_NODE_PROJECT=tsconfig.hardhat.json hardhat compile",
     "deploy": "cross-env TS_NODE_PROJECT=tsconfig.hardhat.json hardhat run scripts/deploy.ts --network alfajores",
     "deploy:alfajores": "cross-env TS_NODE_PROJECT=tsconfig.hardhat.json hardhat run scripts/deploy.ts --network alfajores",
+    "deploy:celo": "cross-env TS_NODE_PROJECT=tsconfig.hardhat.json hardhat run scripts/deployCELO.ts --network alfajores",
+    "check-balance": "cross-env TS_NODE_PROJECT=tsconfig.hardhat.json hardhat run scripts/check-balance.ts --network alfajores",
     "update-oracle": "cross-env TS_NODE_PROJECT=tsconfig.hardhat.json hardhat run scripts/set-oracle-to-bot.ts --network alfajores",
     "oracle:score": "ts-node scripts/ai-oracle-service.ts score",
     "oracle:distribute": "ts-node scripts/ai-oracle-service.ts distribute"
