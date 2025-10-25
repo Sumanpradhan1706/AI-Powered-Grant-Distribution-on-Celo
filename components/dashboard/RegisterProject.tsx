@@ -1,12 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, usePublicClient, useConfig } from 'wagmi';
+import { writeContract, waitForTransactionReceipt } from 'wagmi/actions';
 import { Send, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function RegisterProject() {
   const { address, isConnected } = useAccount();
+  const config = useConfig();
+  const publicClient = usePublicClient();
+
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -14,11 +18,18 @@ export default function RegisterProject() {
     githubUrl: '',
   });
 
+  const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!isConnected || !address) {
       toast.error('Please connect your wallet first');
+      return;
+    }
+
+    if (!CONTRACT_ADDRESS) {
+      toast.error('Contract address not configured');
       return;
     }
 
@@ -56,8 +67,65 @@ export default function RegisterProject() {
         throw new Error(aiData.error || 'Failed to calculate impact score');
       }
 
-      // Step 3: Register project in database
-      toast.info('Registering project...');
+      // Step 3: Register project on blockchain FIRST
+      toast.info('Registering project on blockchain...');
+      toast.info('Please confirm the transaction in your wallet');
+
+      const txHash = await writeContract(config, {
+        address: CONTRACT_ADDRESS,
+        abi: [
+          {
+            inputs: [
+              { name: '_name', type: 'string' },
+              { name: '_description', type: 'string' },
+              { name: '_githubUrl', type: 'string' },
+            ],
+            name: 'registerProject',
+            outputs: [{ name: '', type: 'uint256' }],
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+        ],
+        functionName: 'registerProject',
+        args: [formData.name, formData.description, formData.githubUrl],
+      });
+
+      toast.info('Waiting for blockchain confirmation...');
+
+      // Wait for transaction receipt
+      const receipt = await waitForTransactionReceipt(config, { hash: txHash });
+
+      if (!receipt || receipt.status === 'reverted') {
+        throw new Error('Transaction failed on blockchain');
+      }
+
+      toast.success('✅ Project registered on blockchain!');
+      console.log('Transaction hash:', txHash);
+      console.log('Block number:', receipt.blockNumber);
+
+      // Parse the ProjectRegistered event to get blockchain project ID
+      let blockchainProjectId = null;
+
+      try {
+        // The ProjectRegistered event emits the projectId as the first indexed parameter
+        // Event signature: ProjectRegistered(uint256 indexed projectId, address indexed projectAddress, string name, uint256 timestamp)
+        const projectRegisteredTopic = '0x4d09c5613250bf0fe49cf0253146f4e1c4c1a45c49218a5363f69c7f53a4b3a9'; // keccak256("ProjectRegistered(uint256,address,string,uint256)")
+
+        const log = receipt.logs.find((log: any) => log.topics[0] === projectRegisteredTopic);
+
+        if (log && log.topics[1]) {
+          // The project ID is in topics[1] (first indexed parameter after event signature)
+          blockchainProjectId = parseInt(log.topics[1], 16);
+          console.log('Blockchain Project ID:', blockchainProjectId);
+          toast.info(`Project ID on blockchain: ${blockchainProjectId}`);
+        }
+      } catch (parseError) {
+        console.warn('Could not parse blockchain project ID from event:', parseError);
+        // We'll continue without it - can be manually synced later
+      }
+
+      // Step 4: Save to database
+      toast.info('Saving to database...');
       const projectResponse = await fetch('/api/projects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -66,19 +134,31 @@ export default function RegisterProject() {
           name: formData.name,
           description: formData.description,
           githubUrl: formData.githubUrl,
+          blockchainTxHash: txHash,
+          blockchainProjectId: blockchainProjectId,
+          aiScore: aiData.score || 0,
         }),
       });
 
       const projectData = await projectResponse.json();
       if (!projectData.success) {
-        throw new Error(projectData.error || 'Failed to register project');
+        throw new Error(projectData.error || 'Failed to save to database');
       }
 
-      toast.success('Project registered successfully!');
+      toast.success('🎉 Project registered successfully!');
+      toast.success(`View on CeloScan: https://alfajores.celoscan.io/tx/${txHash}`);
       setFormData({ name: '', description: '', githubUrl: '' });
     } catch (error: any) {
-      console.error('Error:', error);
-      toast.error(error.message || 'Failed to register project');
+      console.error('Registration Error:', error);
+
+      // Show user-friendly error messages
+      if (error.message?.includes('User rejected')) {
+        toast.error('Transaction was cancelled');
+      } else if (error.message?.includes('insufficient funds')) {
+        toast.error('Insufficient funds for gas fees');
+      } else {
+        toast.error(error.message || 'Failed to register project');
+      }
     } finally {
       setLoading(false);
     }
@@ -123,7 +203,7 @@ export default function RegisterProject() {
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="My Awesome Celo Project"
+            placeholder="Your Awesome Celo Project"
           />
         </div>
 

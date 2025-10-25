@@ -19,21 +19,20 @@ export default function FundingHistory() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch grants from API or contract
-    // For now, using mock data
-    setGrants([
-      {
-        id: 1,
-        project_id: 1,
-        project_name: 'Celo DeFi Protocol',
-        amount: '5000',
-        transaction_hash: '0x1234...5678',
-        reason: 'Outstanding contribution to Celo ecosystem',
-        distributed_at: new Date().toISOString(),
-      },
-    ]);
-    setLoading(false);
+    fetchGrants();
   }, []);
+
+  const fetchGrants = async () => {
+    try {
+      // TODO: Fetch from smart contract events or API
+      // For now, showing empty state until real grants are distributed
+      setGrants([]);
+    } catch (error) {
+      console.error('Error fetching grants:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (

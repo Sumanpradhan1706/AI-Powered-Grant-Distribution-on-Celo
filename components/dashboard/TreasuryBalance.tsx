@@ -6,7 +6,7 @@ import { formatEther } from 'viem';
 import { DollarSign, TrendingUp, Users, Wallet } from 'lucide-react';
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
-const cUSD_ADDRESS = '0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1'; // Alfajores cUSD
+const cUSD_ADDRESS = '0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1'; // Celo Alfajores cUSD
 
 export default function TreasuryBalance() {
   const { data: balance } = useReadContract({
@@ -25,8 +25,40 @@ export default function TreasuryBalance() {
 
   const balanceInCUSD = balance ? parseFloat(formatEther(balance as bigint)) : 0;
 
+  // Fetch real stats from contract
+  const { data: totalDistributed } = useReadContract({
+    address: CONTRACT_ADDRESS,
+    abi: [
+      {
+        inputs: [],
+        name: 'totalDistributed',
+        outputs: [{ name: '', type: 'uint256' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+    ],
+    functionName: 'totalDistributed',
+  });
+
+  const { data: projectCount } = useReadContract({
+    address: CONTRACT_ADDRESS,
+    abi: [
+      {
+        inputs: [],
+        name: 'projectCount',
+        outputs: [{ name: '', type: 'uint256' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+    ],
+    functionName: 'projectCount',
+  });
+
+  const totalDistributedUSD = totalDistributed ? parseFloat(formatEther(totalDistributed as bigint)) : 0;
+  const totalProjects = projectCount ? Number(projectCount) : 0;
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div className="bg-gradient-to-br from-blue-900/50 to-blue-800/30 rounded-xl p-6 border border-blue-500/30">
         <div className="flex items-center justify-between mb-4">
           <div className="p-3 bg-blue-500/20 rounded-lg">
@@ -34,9 +66,9 @@ export default function TreasuryBalance() {
           </div>
         </div>
         <div className="text-3xl font-bold text-white mb-1">
-          {balanceInCUSD.toFixed(2)} cUSD
+          ${balanceInCUSD.toFixed(2)}
         </div>
-        <div className="text-sm text-gray-400">Treasury Balance</div>
+        <div className="text-sm text-gray-400">Treasury Balance (cUSD)</div>
       </div>
 
       <div className="bg-gradient-to-br from-green-900/50 to-green-800/30 rounded-xl p-6 border border-green-500/30">
@@ -45,7 +77,9 @@ export default function TreasuryBalance() {
             <DollarSign className="w-6 h-6 text-green-400" />
           </div>
         </div>
-        <div className="text-3xl font-bold text-white mb-1">$2.5M</div>
+        <div className="text-3xl font-bold text-white mb-1">
+          ${totalDistributedUSD.toFixed(2)}
+        </div>
         <div className="text-sm text-gray-400">Total Distributed</div>
       </div>
 
@@ -55,18 +89,8 @@ export default function TreasuryBalance() {
             <Users className="w-6 h-6 text-purple-400" />
           </div>
         </div>
-        <div className="text-3xl font-bold text-white mb-1">524</div>
-        <div className="text-sm text-gray-400">Projects Funded</div>
-      </div>
-
-      <div className="bg-gradient-to-br from-orange-900/50 to-orange-800/30 rounded-xl p-6 border border-orange-500/30">
-        <div className="flex items-center justify-between mb-4">
-          <div className="p-3 bg-orange-500/20 rounded-lg">
-            <TrendingUp className="w-6 h-6 text-orange-400" />
-          </div>
-        </div>
-        <div className="text-3xl font-bold text-white mb-1">+125%</div>
-        <div className="text-sm text-gray-400">Growth This Month</div>
+        <div className="text-3xl font-bold text-white mb-1">{totalProjects}</div>
+        <div className="text-sm text-gray-400">Total Projects</div>
       </div>
     </div>
   );

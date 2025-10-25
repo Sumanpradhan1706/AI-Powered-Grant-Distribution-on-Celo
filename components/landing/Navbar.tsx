@@ -16,21 +16,24 @@ export default function Navbar() {
             </div>
             <span className="text-xl font-bold text-gradient">AI Grant</span>
           </Link>
-          
+
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="#features" className="text-gray-300 hover:text-white transition-colors">
+            <Link href="/features" className="text-gray-300 hover:text-white transition-colors">
               Features
             </Link>
-            <Link href="#how-it-works" className="text-gray-300 hover:text-white transition-colors">
+            <Link href="/how-it-works" className="text-gray-300 hover:text-white transition-colors">
               How It Works
             </Link>
             <Link href="/dashboard" className="text-gray-300 hover:text-white transition-colors">
               Dashboard
             </Link>
+            <Link href="/admin" className="text-blue-400 hover:text-blue-300 transition-colors font-semibold">
+              Admin
+            </Link>
           </div>
-          
+
           <div className="flex items-center space-x-4">
-            <ConnectButton />
+            <ConnectButton showBalance={true} chainStatus="icon" accountStatus="address" />
           </div>
         </div>
       </div>
