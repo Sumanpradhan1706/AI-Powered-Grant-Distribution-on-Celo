@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
     const data = {
       stars: repoResponse.data.stargazers_count,
       forks: repoResponse.data.forks_count,
-      openIssues: repoResponse.data.open_issues_count,
+      issues: repoResponse.data.open_issues_count, // Changed from openIssues to issues
       watchers: repoResponse.data.subscribers_count,
       commits: commitsResponse.data.length,
       pullRequests: prsResponse.data.length,

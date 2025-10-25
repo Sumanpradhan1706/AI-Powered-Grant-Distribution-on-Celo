@@ -43,23 +43,36 @@ export async function POST(request: NextRequest) {
   try {
     const { projectData } = await request.json();
 
+    console.log('📊 Received project data for AI analysis:', projectData);
+
     const {
       githubUrl,
       description,
+      commits = 0,
+      pullRequests = 0,
+      issues = 0,
+      stars = 0,
+      forks = 0,
+      contributors = 0,
+    } = projectData;
+
+    console.log('📈 GitHub Metrics:', {
       commits,
       pullRequests,
       issues,
       stars,
       forks,
-      contributors,
-    } = projectData;
+      contributors
+    });
 
     let analysis;
 
     if (!genAI) {
       // Fallback to mock scoring if no API key
       console.log('🤖 Using mock AI scoring (No Gemini API key found)');
+      console.log('🤖 Using mock AI scoring (No Gemini API key found)');
       analysis = calculateMockScore(projectData);
+      console.log('✅ Mock analysis result:', analysis);
     } else {
       // Use Google Gemini API (FREE!)
       console.log('🤖 Using Google Gemini API (FREE)');
@@ -125,12 +138,16 @@ Provide a JSON response with this exact structure:
           console.warn('Failed to parse Gemini response, using mock scoring');
           analysis = calculateMockScore(projectData);
         }
+        console.log('✅ Gemini analysis result:', analysis);
       } catch (geminiError: any) {
         console.error('Gemini API Error:', geminiError.message);
         console.log('Falling back to mock scoring due to Gemini error');
         analysis = calculateMockScore(projectData);
+        console.log('✅ Fallback analysis result:', analysis);
       }
     }
+
+    console.log('📤 Sending final analysis:', analysis);
 
     return NextResponse.json({
       success: true,
