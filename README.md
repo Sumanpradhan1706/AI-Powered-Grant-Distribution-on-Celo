@@ -1,103 +1,351 @@
-# AI-Powered Grant Distribution on Celo 🚀
+# <img src="./public/logo.svg" alt="AI Grant" width="32" height="32" /> AI-Powered Grant Distribution on Celo - Ai Grant
 
-Smart, transparent, and automated funding for impactful projects powered by AI and Celo blockchain.
+A decentralized platform that combines artificial intelligence with blockchain technology to revolutionize how grants are distributed to impactful projects. Built on Celo blockchain for accessibility, transparency, and fairness.
 
-![Celo](https://img.shields.io/badge/Celo-FCFF52?style=for-the-badge&logo=celo&logoColor=black)
-![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![Solidity](https://img.shields.io/badge/Solidity-363636?style=for-the-badge&logo=solidity&logoColor=white)
+![Hero](./public/Hero.png)
 
-## 📋 Table of Contents
+---
 
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
+## Table of Contents
+
+- [About the Project](#about-the-project)
+- [Key Features](#key-features)
+- [How It Works](#how-it-works)
+- [Technology Stack](#technology-stack)
+- [Smart Contract](#smart-contract)
+- [Screenshots](#screenshots)
 - [Getting Started](#getting-started)
 - [Project Structure](#project-structure)
-- [Smart Contracts](#smart-contracts)
-- [Environment Setup](#environment-setup)
-- [Deployment](#deployment)
 - [Contributing](#contributing)
 
-## 🌟 Overview
+---
 
-This platform revolutionizes grant distribution by combining AI intelligence with blockchain transparency. It automatically evaluates projects based on real metrics and distributes grants to top contributors on the Celo network.
+## About the Project
 
-## ✨ Features
+This platform addresses a critical challenge in the blockchain ecosystem: fair and transparent grant distribution. Traditional grant processes are often opaque, time-consuming, and subject to bias. Our solution leverages AI to analyze projects objectively based on real metrics while using Celo's blockchain to ensure complete transparency and automated execution.
 
-- **AI-Powered Scoring**: Machine learning analyzes GitHub activity, community engagement, and project milestones
-- **Automated Distribution**: Smart contracts automatically distribute cUSD/cEUR to top-ranked projects
-- **Complete Transparency**: All transactions and AI decisions are publicly viewable on-chain
-- **Real-time Dashboard**: Track project rankings, funding history, and treasury balance
-- **Mobile-First**: Built on Celo for global accessibility and low transaction fees
-- **Secure & Audited**: Thoroughly tested smart contracts with security best practices
+The system evaluates projects through multiple dimensions including code quality, community engagement, sustainability, and impact potential. Registered companies vote on proposals, and when consensus is reached, grants are automatically distributed through smart contracts.
 
-## 🛠️ Tech Stack
+**Live Contract Address (Celo Alfajores Testnet):**
+```
+0x0243FD476b211BC4FB086f33876Af847868fdDd7
+```
 
-| Layer | Technology |
-|-------|-----------|
-| **Blockchain** | Celo SDK, Solidity, Hardhat |
-| **Frontend** | Next.js 14, React, TypeScript |
-| **Wallet** | RainbowKit, wagmi, viem |
-| **AI** | OpenAI GPT-4 API |
-| **Database** | Supabase |
-| **Styling** | Tailwind CSS, Framer Motion |
-| **Deployment** | Vercel, Celo Alfajores Testnet |
+[View on Celo Explorer](https://alfajores.celoscan.io/address/0x0243FD476b211BC4FB086f33876Af847868fdDd7)
 
-## 🚀 Getting Started
+---
+
+## Key Features
+
+**For Project Owners:**
+- Submit grant proposals with GitHub integration
+- Real-time AI analysis of project metrics
+- Track voting progress and funding status
+- View complete funding history
+- Receive grants directly to wallet
+
+**For Companies/Voters:**
+- AI-assisted project evaluation
+- Detailed scoring across multiple criteria
+- Transparent voting on blockchain
+- Track assigned projects
+- Review voting history
+
+**For Administrators:**
+- Manage treasury funds (CELO deposits)
+- Register and assign companies to projects
+- Monitor all project submissions
+- View comprehensive analytics
+- Configure AI scoring parameters
+
+**Platform-Wide:**
+- Native CELO token support (no stablecoins needed)
+- Mobile-friendly responsive design
+- Real-time blockchain synchronization
+- Complete transparency of all transactions
+- Secure wallet integration via RainbowKit
+
+---
+
+## How It Works
+
+### 1. Project Submission
+Projects connect their wallet and submit proposals with details including:
+- Project name and description
+- GitHub repository URL
+- Requested grant amount
+
+The system automatically fetches GitHub metrics including commits, stars, forks, issues resolved, and contributor activity.
+
+### 2. AI Analysis
+Our AI analyzes projects across five key dimensions:
+
+- **Code Quality (0-25 points)**: Analyzes commit frequency, code structure, and development activity
+- **Community Engagement (0-20 points)**: Evaluates stars, forks, and contributor participation
+- **Sustainability (0-20 points)**: Assesses long-term viability and maintenance patterns
+- **Impact Potential (0-15 points)**: Measures potential ecosystem contribution
+- **Innovation (0-20 points)**: Reviews uniqueness and technical advancement
+
+Total impact score ranges from 0-100, providing objective project assessment.
+
+### 3. Company Assignment & Voting
+Administrators assign projects to registered companies for review. Companies can:
+- View AI-generated analysis and scores
+- Review detailed project breakdowns
+- Cast votes (Approve/Reject) on blockchain
+- Track their voting history
+
+### 4. Automated Grant Distribution
+When a project receives majority approval (3 out of 5 company votes), the smart contract automatically:
+- Transfers the requested CELO amount from treasury
+- Records the transaction on blockchain
+- Updates project funding status
+- Adds to public funding history
+
+All steps are transparent and verifiable on the Celo blockchain.
+
+---
+
+## Technology Stack
+
+**Blockchain & Smart Contracts:**
+- Solidity 0.8.20
+- Hardhat development environment
+- Celo blockchain (Alfajores testnet)
+- OpenZeppelin contracts for security
+
+**Frontend:**
+- Next.js 14 (React framework)
+- TypeScript for type safety
+- Tailwind CSS for styling
+- Framer Motion for animations
+
+**Web3 Integration:**
+- RainbowKit for wallet connection
+- wagmi hooks for contract interaction
+- viem for Ethereum utilities
+
+**AI & Data:**
+- Google Gemini API for project analysis
+- GitHub API for repository metrics
+- Real-time data processing
+
+**Infrastructure:**
+- Vercel for deployment
+- Environment-based configuration
+- Responsive mobile-first design
+
+---
+
+## Smart Contract
+
+**Contract Name:** GrantDistributionCELO  
+**Network:** Celo Alfajores Testnet  
+**Address:** `0x0243FD476b211BC4FB086f33876Af847868fdDd7`
+
+### Key Functions:
+
+**Project Management:**
+- `proposeProject()` - Submit new grant proposals
+- `getProject(uint256)` - Retrieve project details
+- `projectCount()` - Get total number of projects
+
+**Voting System:**
+- `vote(uint256, bool)` - Cast vote on assigned project
+- `getProjectAssignedCompanies(uint256)` - View assigned voters
+- `hasVoted(uint256, address)` - Check if company voted
+
+**Treasury:**
+- `depositToTreasury()` - Add CELO to grant pool (payable)
+- `getTreasuryBalance()` - View available funds
+- `distributeGrant(uint256)` - Execute approved grant distribution
+
+**Administration:**
+- `registerCompany(address, string)` - Register voting companies
+- `assignProjectToCompany(uint256, address)` - Assign projects to voters
+- `setMajorityThreshold(uint256)` - Configure voting threshold
+
+### Events:
+- `ProjectProposed` - New project submitted
+- `VoteCast` - Company voted on project
+- `ProjectApproved` - Project reached voting threshold
+- `GrantDistributed` - Funds transferred to project
+- `TreasuryDeposit` - Funds added to treasury
+
+---
+
+## Screenshots
+
+### Landing Page
+![Hero Section](./public/Hero.png)
+*Modern landing page with animated 3D background and clear call-to-action*
+
+### User Dashboard
+![User Dashboard](./public/User.png)
+*Project owners can submit proposals, track voting status, and view funding history*
+
+### Voting Panel (Company View)
+![Voting Panel](./public/Voting.png)
+*Companies review AI analysis and cast votes on assigned projects*
+
+### Admin Dashboard
+![Admin Dashboard](./public/Admin1.png)
+*Administrators manage treasury, register companies, and monitor all activities*
+
+---
+
+## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ and npm/yarn
-- Git
-- MetaMask or compatible Web3 wallet
-- Celo wallet with testnet funds (get from [Celo Faucet](https://faucet.celo.org))
+Before you begin, ensure you have:
+- Node.js 18.0 or higher installed
+- A Celo-compatible wallet (MetaMask, Valora, etc.)
+- Testnet CELO tokens from [Celo Faucet](https://faucet.celo.org/alfajores)
 
 ### Installation
 
-1. **Clone the repository**
+1. Clone the repository:
 ```bash
-git clone <your-repo-url>
-cd celo
+git clone https://github.com/Sumanpradhan1706/AI-Powered-Grant-Distribution-on-Celo.git
+cd AI-Powered-Grant-Distribution-on-Celo
 ```
 
-2. **Install dependencies**
+2. Install dependencies:
 ```bash
 npm install
 ```
 
-3. **Set up environment variables**
+3. Create environment file:
 ```bash
-cp .env.example .env
+cp .env.example .env.local
 ```
 
-Edit `.env` with your credentials:
+4. Configure your `.env.local` file:
 ```env
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+# Google Gemini API (Free tier available)
+GEMINI_API_KEY=your_gemini_api_key
 
-# OpenAI
-OPENAI_API_KEY=your_openai_api_key
+# GitHub API Token (for repository analysis)
+GITHUB_TOKEN=your_github_token
 
-# GitHub
-GITHUB_TOKEN=your_github_personal_access_token
-
-# Celo
+# Celo Configuration
 NEXT_PUBLIC_CELO_NETWORK=alfajores
-NEXT_PUBLIC_CONTRACT_ADDRESS= # Will be filled after deployment
+NEXT_PUBLIC_CONTRACT_ADDRESS=0x0243FD476b211BC4FB086f33876Af847868fdDd7
 
-# WalletConnect
+# WalletConnect Project ID
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id
 
-# Hardhat (for deployment)
+# Admin wallet address
+NEXT_PUBLIC_OWNER_ADDRESS=your_admin_wallet_address
+```
+
+### Running the Application
+
+Development mode:
+```bash
+npm run dev
+```
+
+Production build:
+```bash
+npm run build
+npm start
+```
+
+Access the application at `http://localhost:3000`
+
+### Deploying Smart Contracts (Optional)
+
+If you want to deploy your own contract:
+
+1. Add your private key to `.env.local`:
+```env
 PRIVATE_KEY=your_wallet_private_key
 ```
 
-4. **Compile smart contracts**
+2. Compile contracts:
 ```bash
-npm run compile
+npx hardhat compile
 ```
+
+3. Deploy to Alfajores testnet:
+```bash
+npx hardhat run scripts/deployCELO.ts --network alfajores
+```
+
+4. Update `NEXT_PUBLIC_CONTRACT_ADDRESS` with your new contract address
+
+---
+
+## Project Structure
+
+```
+AI-Powered-Grant-Distribution-on-Celo/
+├── app/                          # Next.js app directory
+│   ├── api/                      # API routes
+│   │   ├── ai/score/            # AI scoring endpoint
+│   │   ├── contract/            # Contract interaction APIs
+│   │   └── github/              # GitHub data fetching
+│   ├── admin/                   # Admin dashboard page
+│   ├── company/                 # Company voting page
+│   ├── dashboard/               # User dashboard page
+│   └── layout.tsx               # Root layout
+├── components/                   # React components
+│   ├── admin/                   # Admin panel components
+│   ├── company/                 # Voting components
+│   ├── dashboard/               # User dashboard components
+│   └── landing/                 # Landing page components
+├── contracts/                    # Solidity smart contracts
+│   └── GrantDistributionCELO.sol
+├── scripts/                      # Deployment scripts
+│   └── deployCELO.ts
+├── public/                       # Static assets
+│   ├── Hero.png
+│   ├── User.png
+│   ├── Voting.png
+│   ├── Admin1.png
+│   └── logo.svg
+├── lib/                         # Utility libraries
+├── hardhat.config.ts            # Hardhat configuration
+├── next.config.js               # Next.js configuration
+└── package.json                 # Dependencies
+```
+
+---
+
+## Contributing
+
+We welcome contributions from the community! Here's how you can help:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+Please ensure your code follows the existing style and includes appropriate tests.
+
+---
+
+## Contact & Support
+
+- **Repository:** [GitHub](https://github.com/Sumanpradhan1706/AI-Powered-Grant-Distribution-on-Celo)
+- **Issues:** Report bugs or request features through GitHub Issues
+- **Contract Address:** `0x0243FD476b211BC4FB086f33876Af847868fdDd7`
+
+---
+
+## Acknowledgments
+
+- Built on [Celo](https://celo.org) blockchain for mobile-first accessibility
+- Powered by [Google Gemini](https://ai.google.dev) for AI analysis
+- UI components inspired by modern Web3 design patterns
+- Special thanks to the Celo community for support and resources
+
+---
+
+**Note:** This platform is currently deployed on Celo Alfajores testnet for testing purposes. Always use testnet tokens and never share private keys or sensitive information.
 
 5. **Deploy contracts to Alfajores testnet**
 ```bash
@@ -285,9 +533,6 @@ Contributions are welcome! Please follow these steps:
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📄 License
-
-This project is licensed under the MIT License.
 
 ## 🙏 Acknowledgments
 
@@ -295,14 +540,5 @@ This project is licensed under the MIT License.
 - [OpenAI](https://openai.com) for AI capabilities
 - [RainbowKit](https://www.rainbowkit.com/) for wallet connectivity
 - [Supabase](https://supabase.com) for the database
-
-## 📞 Support
-
-For questions and support:
-- GitHub Issues: [Create an issue](https://github.com/yourusername/celo/issues)
-- Discord: [Join our community](#)
-- Twitter: [@yourhandle](#)
-
----
 
 Built with ❤️ for the Celo ecosystem
