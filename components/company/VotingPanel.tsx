@@ -49,7 +49,12 @@ export default function VotingPanel() {
     const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
 
     // Read contract to get assigned projects
-    const { data: assignedProjectIds } = useReadContract({
+    const {
+        data: assignedProjectIds,
+        isLoading: isLoadingAssignments,
+        isError: isAssignmentsError,
+        error: assignmentsError
+    } = useReadContract({
         address: contractAddress,
         abi: [
             {
@@ -64,33 +69,97 @@ export default function VotingPanel() {
         args: address ? [address] : undefined,
     });
 
+    // Debug logging for contract read
     useEffect(() => {
-        fetchProjects();
-    }, [assignedProjectIds]);
+        console.log('🔍 VotingPanel - Contract Read Debug:');
+        console.log('  Connected Address:', address);
+        console.log('  Is Loading Assignments:', isLoadingAssignments);
+        console.log('  Is Error:', isAssignmentsError);
+        console.log('  Error:', assignmentsError);
+        console.log('  Assigned Project IDs:', assignedProjectIds);
+        console.log('  Assigned Project IDs Type:', typeof assignedProjectIds);
+        console.log('  Is Array?:', Array.isArray(assignedProjectIds));
+    }, [address, assignedProjectIds, isLoadingAssignments, isAssignmentsError, assignmentsError]);
+
+    useEffect(() => {
+        if (address && assignedProjectIds) {
+            fetchProjects();
+        }
+    }, [assignedProjectIds, address]);
 
     const fetchProjects = async () => {
         try {
-            const response = await fetch('/api/projects');
-            if (response.ok) {
-                const data = await response.json();
-                const allProjects = Array.isArray(data) ? data : (data.projects || []);
+            console.log('📊 Fetching assigned projects from blockchain...');
+            console.log('Assigned Project IDs:', assignedProjectIds);
 
-                // Filter projects to show only assigned ones
-                if (assignedProjectIds && assignedProjectIds.length > 0) {
-                    const assignedIds = assignedProjectIds.map((id: bigint) => Number(id));
-                    const filteredProjects = allProjects.filter((p: ProjectData) =>
-                        assignedIds.includes(p.id)
-                    );
-                    setProjects(filteredProjects);
-                    console.log(`Showing ${filteredProjects.length} assigned projects out of ${allProjects.length} total`);
-                } else {
-                    setProjects([]);
-                    console.log('No projects assigned to this company');
-                }
+            if (!assignedProjectIds || assignedProjectIds.length === 0) {
+                console.log('⚠️ No projects assigned to this company');
+                setProjects([]);
+                return;
             }
+
+            // Convert BigInt IDs to numbers
+            const assignedIds = assignedProjectIds.map((id: bigint) => Number(id));
+            console.log(`✅ Company has ${assignedIds.length} assigned project(s): ${assignedIds.join(', ')}`);
+
+            // Fetch all assigned projects from blockchain
+            const projectPromises = assignedIds.map(async (projectId) => {
+                try {
+                    const response = await fetch('/api/contract/read', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            functionName: 'getProject',
+                            args: [projectId.toString()],
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        console.error(`❌ Failed to fetch project ${projectId}`);
+                        return null;
+                    }
+
+                    const data = await response.json();
+
+                    if (data.success && data.result) {
+                        const project = data.result;
+                        console.log(`✅ Fetched project ${projectId}:`, project.name);
+
+                        return {
+                            id: typeof project.id === 'string' ? parseInt(project.id) : Number(project.id),
+                            name: project.name || 'Unnamed Project',
+                            description: project.description || 'No description',
+                            githubUrl: project.githubUrl || '',
+                            requestedAmount: typeof project.requestedAmount === 'string'
+                                ? project.requestedAmount
+                                : project.requestedAmount?.toString() || '0',
+                            votesFor: typeof project.votesFor === 'string'
+                                ? parseInt(project.votesFor)
+                                : Number(project.votesFor || 0),
+                            votesAgainst: typeof project.votesAgainst === 'string'
+                                ? parseInt(project.votesAgainst)
+                                : Number(project.votesAgainst || 0),
+                            isApproved: project.isApproved || false,
+                            isFunded: project.isFunded || false,
+                            projectAddress: project.projectAddress || '',
+                        };
+                    }
+
+                    return null;
+                } catch (err) {
+                    console.error(`❌ Error fetching project ${projectId}:`, err);
+                    return null;
+                }
+            });
+
+            const projectResults = await Promise.all(projectPromises);
+            const validProjects = projectResults.filter((p): p is ProjectData => p !== null);
+
+            console.log(`✅ Successfully fetched ${validProjects.length} projects from blockchain`);
+            setProjects(validProjects);
         } catch (error) {
-            console.error('Error fetching projects:', error);
-            setProjects([]); // Set empty array on error
+            console.error('❌ Error fetching projects:', error);
+            setProjects([]);
         }
     };
 
@@ -292,13 +361,33 @@ export default function VotingPanel() {
                     Vote on Grant Proposals with AI Analysis
                 </h3>
 
-                {projects.length === 0 ? (
+                {isLoadingAssignments ? (
+                    <div className="text-center py-12">
+                        <Loader2 className="w-12 h-12 mx-auto mb-4 animate-spin text-blue-400" />
+                        <p className="text-gray-400 text-lg">Loading assigned projects...</p>
+                        <p className="text-gray-500 text-sm mt-2">
+                            Checking blockchain for projects assigned to your company
+                        </p>
+                    </div>
+                ) : isAssignmentsError ? (
+                    <div className="text-center py-12">
+                        <AlertCircle className="w-16 h-16 mx-auto mb-4 text-red-400" />
+                        <p className="text-red-400 text-lg">Error loading assignments</p>
+                        <p className="text-gray-500 text-sm mt-2">
+                            {assignmentsError?.message || 'Failed to fetch assigned projects'}
+                        </p>
+                    </div>
+                ) : projects.length === 0 ? (
                     <div className="text-center py-12">
                         <FileText className="w-16 h-16 mx-auto mb-4 opacity-50 text-gray-500" />
                         <p className="text-gray-400 text-lg">No projects assigned to your company yet</p>
                         <p className="text-gray-500 text-sm mt-2">
                             Please wait for the admin to assign projects for review
                         </p>
+                        <div className="mt-4 text-xs text-gray-600 bg-gray-800/50 rounded p-3 max-w-md mx-auto">
+                            <p className="font-mono">Connected: {address}</p>
+                            <p className="font-mono">Assigned IDs: {assignedProjectIds ? JSON.stringify(assignedProjectIds, (key, value) => typeof value === 'bigint' ? value.toString() : value) : 'null'}</p>
+                        </div>
                     </div>
                 ) : (
                     <div className="space-y-4">
@@ -345,9 +434,9 @@ export default function VotingPanel() {
                                             <div className="bg-green-500/20 rounded-lg px-4 py-2 border border-green-500/30">
                                                 <DollarSign className="w-5 h-5 text-green-400 mx-auto mb-1" />
                                                 <p className="text-2xl font-bold text-green-400">
-                                                    {project.requestedAmount}
+                                                    {formatUnits(BigInt(project.requestedAmount), 18)}
                                                 </p>
-                                                <p className="text-xs text-gray-400">cUSD</p>
+                                                <p className="text-xs text-gray-400">CELO</p>
                                             </div>
                                         </div>
                                     </div>
