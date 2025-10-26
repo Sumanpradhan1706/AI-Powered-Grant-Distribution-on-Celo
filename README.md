@@ -410,135 +410,23 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## 📁 Project Structure
+---
 
-```
-celo/
-├── app/                      # Next.js 14 app directory
-│   ├── api/                 # API routes
-│   │   ├── ai/             # AI scoring endpoints
-│   │   ├── github/         # GitHub data fetching
-│   │   └── projects/       # Project CRUD operations
-│   ├── dashboard/          # Dashboard page
-│   ├── globals.css         # Global styles
-│   ├── layout.tsx          # Root layout
-│   ├── page.tsx            # Landing page
-│   └── providers.tsx       # Web3 providers
-├── components/
-│   ├── dashboard/          # Dashboard components
-│   │   ├── ProjectLeaderboard.tsx
-│   │   ├── TreasuryBalance.tsx
-│   │   ├── FundingHistory.tsx
-│   │   └── RegisterProject.tsx
-│   ├── landing/            # Landing page components
-│   │   ├── Hero.tsx
-│   │   ├── Features.tsx
-│   │   ├── HowItWorks.tsx
-│   │   ├── Stats.tsx
-│   │   ├── CTA.tsx
-│   │   ├── Navbar.tsx
-│   │   └── Footer.tsx
-│   └── ui/                 # Reusable UI components
-│       └── tabs.tsx
-├── contracts/              # Solidity smart contracts
-│   └── GrantDistribution.sol
-├── lib/                    # Utility functions
-│   ├── utils.ts
-│   └── supabase.ts
-├── scripts/                # Deployment scripts
-│   └── deploy.ts
-├── hardhat.config.ts       # Hardhat configuration
-├── next.config.js          # Next.js configuration
-├── tailwind.config.ts      # Tailwind CSS configuration
-└── package.json            # Dependencies
-```
+## Contact & Support
 
-## 📜 Smart Contracts
+- **Repository:** [GitHub](https://github.com/Sumanpradhan1706/AI-Powered-Grant-Distribution-on-Celo)
+- **Issues:** Report bugs or request features through GitHub Issues
+- **Contract Address:** `0x0243FD476b211BC4FB086f33876Af847868fdDd7`
 
-### GrantDistribution.sol
+---
 
-Main contract managing the grant distribution system:
+## Acknowledgments
 
-**Key Functions:**
-- `registerProject()`: Register a new project
-- `updateImpactScore()`: Update project's AI-calculated score (oracle only)
-- `distributeGrants()`: Automatically distribute grants to top projects
-- `getTreasuryBalance()`: Check available funds
-- `verifyProject()`: Mark project as verified (owner only)
+- Built on [Celo](https://celo.org) blockchain for mobile-first accessibility
+- Powered by [Google Gemini](https://ai.google.dev) for AI analysis
+- UI components inspired by modern Web3 design patterns
+- Special thanks to the Celo community for support and resources
 
-**Events:**
-- `ProjectRegistered`: Emitted when a new project registers
-- `ImpactScoreUpdated`: Emitted when score is updated
-- `GrantDistributed`: Emitted when grant is sent
-- `TreasuryDeposit`: Emitted when funds are added
+---
 
-## 🔧 Environment Setup
-
-### Get Your API Keys
-
-1. **Supabase**: Sign up at [supabase.com](https://supabase.com) and create a project
-2. **OpenAI**: Get API key from [platform.openai.com](https://platform.openai.com)
-3. **GitHub**: Create a personal access token at [github.com/settings/tokens](https://github.com/settings/tokens)
-4. **WalletConnect**: Get project ID from [cloud.walletconnect.com](https://cloud.walletconnect.com)
-
-### Celo Testnet Setup
-
-1. Add Celo Alfajores to MetaMask:
-   - Network Name: Celo Alfajores Testnet
-   - RPC URL: https://alfajores-forno.celo-testnet.org
-   - Chain ID: 44787
-   - Currency Symbol: CELO
-   - Block Explorer: https://alfajores.celoscan.io
-
-2. Get testnet funds from [Celo Faucet](https://faucet.celo.org)
-
-## 🚢 Deployment
-
-### Deploy to Vercel
-
-1. Push your code to GitHub
-
-2. Import project in Vercel:
-   - Connect your GitHub repository
-   - Select the `celo` folder
-   - Add all environment variables from `.env`
-
-3. Deploy! Vercel will automatically build and deploy your app.
-
-### Deploy Smart Contracts to Mainnet
-
-1. Update `hardhat.config.ts` to use mainnet:
-```typescript
-celo: {
-  url: "https://forno.celo.org",
-  accounts: [process.env.PRIVATE_KEY],
-  chainId: 42220,
-}
-```
-
-2. Deploy:
-```bash
-npx hardhat run scripts/deploy.ts --network celo
-```
-
-3. Update `NEXT_PUBLIC_CONTRACT_ADDRESS` in Vercel environment variables
-
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-
-## 🙏 Acknowledgments
-
-- [Celo](https://celo.org) for the blockchain infrastructure
-- [OpenAI](https://openai.com) for AI capabilities
-- [RainbowKit](https://www.rainbowkit.com/) for wallet connectivity
-- [Supabase](https://supabase.com) for the database
-
-Built with ❤️ for the Celo ecosystem
+**Note:** This platform is currently deployed on Celo Alfajores testnet for testing purposes. Always use testnet tokens and never share private keys or sensitive information.
