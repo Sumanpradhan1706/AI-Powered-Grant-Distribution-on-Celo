@@ -615,27 +615,6 @@ export default function VotingPanel() {
                     </div>
                 )}
             </div>
-
-            {/* Info Box */}
-            <div className="bg-purple-500/10 border border-purple-500/30 rounded-xl p-6">
-                <h4 className="text-lg font-bold text-white mb-3 flex items-center">
-                    <Brain className="w-5 h-5 mr-2 text-purple-400" />
-                    How AI-Assisted Voting Works
-                </h4>
-                <ol className="space-y-2 text-gray-300 text-sm">
-                    <li>1. <strong>AI Analysis:</strong> Click "Analyze with AI" to get detailed project evaluation</li>
-                    <li>2. <strong>Review Score:</strong> AI provides impact score (0-100) and detailed breakdown</li>
-                    <li>3. <strong>Make Decision:</strong> Use AI insights to make informed voting decision</li>
-                    <li>4. <strong>Vote on Blockchain:</strong> Your vote is permanently recorded on Celo blockchain</li>
-                    <li>5. <strong>Automatic Distribution:</strong> When 3/5 companies approve, grant is auto-distributed</li>
-                </ol>
-                <div className="mt-4 bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
-                    <p className="text-blue-400 text-sm">
-                        ✨ <strong>AI Analysis includes:</strong> Code quality, community engagement, sustainability,
-                        impact potential, innovation score, and actionable recommendations.
-                    </p>
-                </div>
-            </div>
         </div>
     );
 }
