@@ -58,7 +58,7 @@ export default function TreasuryManagerCELO() {
 
         try {
             const amountInWei = parseEther(depositAmount);
-            console.log('📝 Initiating CELO deposit:', depositAmount, 'CELO');
+
             console.log('💰 Amount in Wei:', amountInWei.toString());
 
             // Send CELO directly to contract
@@ -85,7 +85,6 @@ export default function TreasuryManagerCELO() {
     // Refresh balances after successful transfer
     useEffect(() => {
         if (isDepositSuccess) {
-            console.log('✅ Deposit successful! Refreshing balances...');
 
             // Store the deposited amount for display
             setDepositedAmount(depositAmount);
@@ -96,7 +95,7 @@ export default function TreasuryManagerCELO() {
 
             // Wait a bit for blockchain to update, then refresh
             setTimeout(() => {
-                console.log('🔄 Refetching balances...');
+
                 refetchBalance();
                 refetchUserBalance();
             }, 2000);
@@ -197,20 +196,6 @@ export default function TreasuryManagerCELO() {
                 </h3>
 
                 <div className="space-y-4">
-                    {/* Debug Info */}
-                    {(isDepositPending || isDepositConfirming || isDepositSuccess || isDepositError) && (
-                        <div className="bg-gray-900/80 border border-gray-600 rounded-lg p-3 text-xs font-mono">
-                            <p className="text-gray-400 font-bold mb-2">🔍 Transaction Debug Info:</p>
-                            <div className="space-y-1 text-gray-300">
-                                <p>Deposit Pending: {isDepositPending ? '✅' : '❌'}</p>
-                                <p>Deposit Confirming: {isDepositConfirming ? '✅' : '❌'}</p>
-                                <p>Deposit Success: {isDepositSuccess ? '✅ YES' : '❌ No'}</p>
-                                <p>Deposit Error: {isDepositError ? '❌ YES' : '✅ No'}</p>
-                                {depositHash && <p>Tx Hash: {depositHash.slice(0, 10)}...{depositHash.slice(-6)}</p>}
-                            </div>
-                        </div>
-                    )}
-
                     {/* User Balance */}
                     <div className="bg-gray-900/50 rounded-lg p-4">
                         <p className="text-sm text-gray-400 mb-3">💰 Your CELO Balance</p>

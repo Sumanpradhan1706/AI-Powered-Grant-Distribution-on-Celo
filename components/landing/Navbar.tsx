@@ -1,20 +1,27 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { Sparkles } from 'lucide-react';
 
 export default function Navbar() {
   return (
     <nav className="fixed top-0 w-full z-50 bg-gray-900/80 backdrop-blur-lg border-b border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="relative">
-              <Sparkles className="w-8 h-8 text-blue-500" />
-              <div className="absolute inset-0 blur-xl bg-blue-500/50"></div>
+          <Link href="/" className="flex items-center space-x-3 group">
+            <div className="relative w-10 h-10 transition-transform group-hover:scale-110 duration-300">
+              <Image
+                src="/logo.svg"
+                alt="AI Grant Logo"
+                width={40}
+                height={40}
+                className="drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]"
+              />
             </div>
-            <span className="text-xl font-bold text-gradient">AI Grant</span>
+            <span className="text-xl font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">
+              AI Grant
+            </span>
           </Link>
 
           <div className="hidden md:flex items-center space-x-8">

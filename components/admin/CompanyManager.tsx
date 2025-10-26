@@ -52,7 +52,6 @@ export default function CompanyManager() {
     const fetchProjects = async () => {
         setLoadingProjects(true);
         try {
-            console.log('📊 Fetching all projects from blockchain...');
 
             // First, get the total project count
             const countResponse = await fetch('/api/contract/read', {
@@ -72,8 +71,6 @@ export default function CompanyManager() {
 
             const countData = await countResponse.json();
             const projectCount = countData.result ? parseInt(countData.result) : 0;
-
-            console.log(`✅ Total projects on blockchain: ${projectCount}`);
 
             if (projectCount === 0) {
                 setProjects([]);
@@ -108,7 +105,6 @@ export default function CompanyManager() {
                     };
                 });
 
-            console.log(`✅ Fetched ${fetchedProjects.length} projects from blockchain`);
             setProjects(fetchedProjects);
         } catch (err) {
             console.error('❌ Error fetching projects:', err);

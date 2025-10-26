@@ -93,7 +93,7 @@ export default function TreasuryManager() {
 
         try {
             const amountInWei = parseUnits(depositAmount, 18);
-            console.log('📝 Initiating deposit:', depositAmount, 'cUSD');
+
             console.log('💰 Amount in Wei:', amountInWei.toString());
 
             // First approve the transfer
@@ -145,7 +145,6 @@ export default function TreasuryManager() {
     // Refresh balances after successful transfer
     useEffect(() => {
         if (isTransferSuccess) {
-            console.log('✅ Deposit successful! Refreshing balances...');
 
             // Store the deposited amount for display
             setDepositedAmount(depositAmount);
@@ -156,7 +155,7 @@ export default function TreasuryManager() {
 
             // Wait a bit for blockchain to update, then refresh
             setTimeout(() => {
-                console.log('🔄 Refetching balances...');
+
                 refetchBalance();
                 refetchUserBalance();
             }, 2000); // Wait 2 seconds before refetching
@@ -257,25 +256,6 @@ export default function TreasuryManager() {
                 </h3>
 
                 <div className="space-y-4">
-                    {/* Debug Info - Shows transaction state */}
-                    {(isApprovePending || isApproveConfirming || isTransferPending || isTransferConfirming || isTransferSuccess || isApproveError || isTransferError) && (
-                        <div className="bg-gray-900/80 border border-gray-600 rounded-lg p-3 text-xs font-mono">
-                            <p className="text-gray-400 font-bold mb-2">🔍 Transaction Debug Info:</p>
-                            <div className="space-y-1 text-gray-300">
-                                <p>Approve Pending: {isApprovePending ? '✅' : '❌'}</p>
-                                <p>Approve Confirming: {isApproveConfirming ? '✅' : '❌'}</p>
-                                <p>Approve Success: {isApproveSuccess ? '✅' : '❌'}</p>
-                                <p>Approve Error: {isApproveError ? '❌ YES' : '✅ No'}</p>
-                                <p>Transfer Pending: {isTransferPending ? '✅' : '❌'}</p>
-                                <p>Transfer Confirming: {isTransferConfirming ? '✅' : '❌'}</p>
-                                <p>Transfer Success: {isTransferSuccess ? '✅ YES' : '❌ No'}</p>
-                                <p>Transfer Error: {isTransferError ? '❌ YES' : '✅ No'}</p>
-                                {approveHash && <p>Approve Hash: {approveHash.slice(0, 10)}...{approveHash.slice(-6)}</p>}
-                                {transferHash && <p>Transfer Hash: {transferHash.slice(0, 10)}...{transferHash.slice(-6)}</p>}
-                            </div>
-                        </div>
-                    )}
-
                     {/* User Balance */}
                     <div className="bg-gray-900/50 rounded-lg p-4">
                         <p className="text-sm text-gray-400 mb-3">💰 Your Wallet Balances</p>

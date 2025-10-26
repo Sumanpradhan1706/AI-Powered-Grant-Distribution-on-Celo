@@ -103,7 +103,6 @@ export async function POST(request: NextRequest) {
       data,
     });
   } catch (error: any) {
-    console.error('GitHub API Error:', error);
     return NextResponse.json(
       {
         success: false,

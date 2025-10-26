@@ -43,8 +43,6 @@ export async function POST(request: NextRequest) {
   try {
     const { projectData } = await request.json();
 
-    console.log('📊 Received project data for AI analysis:', projectData);
-
     const {
       githubUrl,
       description,
@@ -56,26 +54,14 @@ export async function POST(request: NextRequest) {
       contributors = 0,
     } = projectData;
 
-    console.log('📈 GitHub Metrics:', {
-      commits,
-      pullRequests,
-      issues,
-      stars,
-      forks,
-      contributors
-    });
-
     let analysis;
 
     if (!genAI) {
       // Fallback to mock scoring if no API key
-      console.log('🤖 Using mock AI scoring (No Gemini API key found)');
-      console.log('🤖 Using mock AI scoring (No Gemini API key found)');
       analysis = calculateMockScore(projectData);
-      console.log('✅ Mock analysis result:', analysis);
+
     } else {
       // Use Google Gemini API (FREE!)
-      console.log('🤖 Using Google Gemini API (FREE)');
 
       const prompt = `You are an expert blockchain project evaluator specializing in assessing Web3 projects for grant distribution. Provide objective, data-driven analysis.
 
@@ -135,26 +121,21 @@ Provide a JSON response with this exact structure:
           analysis = JSON.parse(jsonMatch[0]);
         } else {
           // Fallback to mock if parsing fails
-          console.warn('Failed to parse Gemini response, using mock scoring');
+
           analysis = calculateMockScore(projectData);
         }
-        console.log('✅ Gemini analysis result:', analysis);
+
       } catch (geminiError: any) {
-        console.error('Gemini API Error:', geminiError.message);
-        console.log('Falling back to mock scoring due to Gemini error');
         analysis = calculateMockScore(projectData);
-        console.log('✅ Fallback analysis result:', analysis);
+
       }
     }
-
-    console.log('📤 Sending final analysis:', analysis);
 
     return NextResponse.json({
       success: true,
       analysis,
     });
   } catch (error: any) {
-    console.error('AI Scoring Error:', error);
     // Even if there's an error, return mock scoring instead of failing
     const mockAnalysis = calculateMockScore({
       commits: 0,

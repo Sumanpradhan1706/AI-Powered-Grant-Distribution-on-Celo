@@ -105,8 +105,7 @@ export default function RegisterProject() {
       }
 
       toast.success('✅ Project registered on blockchain!');
-      console.log('Transaction hash:', txHash);
-      console.log('Block number:', receipt.blockNumber);
+
 
       // Parse the ProjectRegistered event to get blockchain project ID
       let blockchainProjectId = null;
@@ -121,11 +120,11 @@ export default function RegisterProject() {
         if (log && log.topics && log.topics[1]) {
           // The project ID is in topics[1] (first indexed parameter after event signature)
           blockchainProjectId = parseInt(log.topics[1], 16);
-          console.log('Blockchain Project ID:', blockchainProjectId);
+
           toast.info(`Project ID on blockchain: ${blockchainProjectId}`);
         }
       } catch (parseError) {
-        console.warn('Could not parse blockchain project ID from event:', parseError);
+
         // We'll continue without it - can be manually synced later
       }
 

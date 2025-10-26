@@ -92,13 +92,11 @@ export default function ProjectProposal() {
     const handleProposeProject = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        console.log('=== Starting Project Proposal ===');
-        console.log('Project Name:', projectName);
-        console.log('Description:', description);
-        console.log('GitHub URL:', githubUrl);
-        console.log('Requested Amount:', requestedAmount);
-        console.log('Contract Address:', contractAddress);
-        console.log('User Address:', address);
+
+
+
+
+
 
         if (!projectName || !description || !githubUrl || !requestedAmount) {
             alert('Please fill in all fields');
@@ -120,7 +118,6 @@ export default function ProjectProposal() {
             const amountInWei = parseUnits(requestedAmount, 18); // CELO has 18 decimals
             console.log('Amount in Wei:', amountInWei.toString());
 
-            console.log('Calling writeContract...');
             writeContract({
                 address: contractAddress,
                 abi: [
@@ -140,7 +137,7 @@ export default function ProjectProposal() {
                 functionName: 'proposeProject',
                 args: [projectName, description, githubUrl, amountInWei],
             });
-            console.log('writeContract called successfully');
+
         } catch (err) {
             console.error('Error proposing project:', err);
             alert(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
@@ -149,7 +146,7 @@ export default function ProjectProposal() {
 
     useEffect(() => {
         if (isSuccess) {
-            console.log('✅ Transaction successful! Hash:', hash);
+
             // Show notification
             setShowNotification(true);
 
@@ -184,13 +181,13 @@ export default function ProjectProposal() {
 
     useEffect(() => {
         if (isPending) {
-            console.log('⏳ Transaction pending - waiting for user confirmation in wallet...');
+
         }
     }, [isPending]);
 
     useEffect(() => {
         if (isConfirming) {
-            console.log('⏳ Transaction confirming - waiting for blockchain confirmation...');
+
         }
     }, [isConfirming]);
 
@@ -269,23 +266,6 @@ export default function ProjectProposal() {
             )}
 
             <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
-                {/* Debug Panel - Remove after testing */}
-                {process.env.NODE_ENV === 'development' && (
-                    <div className="mb-4 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg text-xs">
-                        <p className="font-bold text-blue-400 mb-2">🔧 Debug Info:</p>
-                        <div className="space-y-1 text-gray-300">
-                            <p>Contract: {contractAddress || 'Not set'}</p>
-                            <p>User Address: {address || 'Not connected'}</p>
-                            <p>isPending: {isPending ? 'Yes' : 'No'}</p>
-                            <p>isConfirming: {isConfirming ? 'Yes' : 'No'}</p>
-                            <p>isSuccess: {isSuccess ? 'Yes' : 'No'}</p>
-                            <p>isError: {isError ? 'Yes' : 'No'}</p>
-                            <p>Hash: {hash || 'None'}</p>
-                            {error && <p className="text-red-400">Error: {error.message}</p>}
-                        </div>
-                    </div>
-                )}
-
                 <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
                     <FileText className="w-6 h-6 mr-2 text-green-400" />
                     Propose Your Project for Grant

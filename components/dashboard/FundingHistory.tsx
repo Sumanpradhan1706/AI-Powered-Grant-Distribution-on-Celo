@@ -32,7 +32,6 @@ export default function FundingHistory() {
     setError(null);
 
     try {
-      console.log('📊 Fetching funding history from blockchain...');
 
       // Fetch GrantDistributed events from the contract
       const response = await fetch('/api/contract/events', {
@@ -44,8 +43,6 @@ export default function FundingHistory() {
         }),
       });
 
-      console.log('📡 Events API response status:', response.status);
-
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
         console.error('❌ Failed to fetch events:', errorData);
@@ -55,7 +52,6 @@ export default function FundingHistory() {
       }
 
       const data = await response.json();
-      console.log('✅ Events fetched:', data);
 
       if (data.success && data.events && Array.isArray(data.events)) {
         // Fetch project names for each grant
@@ -82,7 +78,7 @@ export default function FundingHistory() {
                 }
               }
             } catch (err) {
-              console.warn(`Failed to fetch project ${args.projectId} name:`, err);
+
             }
 
             return {
@@ -102,10 +98,9 @@ export default function FundingHistory() {
           })
         );
 
-        console.log(`✅ Processed ${grantsWithDetails.length} grants`);
         setGrants(grantsWithDetails.reverse()); // Most recent first
       } else {
-        console.log('ℹ️ No grants distributed yet');
+
         setGrants([]);
       }
     } catch (error: any) {

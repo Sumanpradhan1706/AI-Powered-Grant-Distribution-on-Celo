@@ -83,8 +83,6 @@ export async function GET(request: NextRequest) {
         const functionName = searchParams.get('function');
         const argsParam = searchParams.get('args');
 
-        console.log(`📡 GET: Function: ${functionName}, Args: ${argsParam}`);
-
         if (!functionName) {
             return NextResponse.json(
                 { success: false, error: 'Function name is required' },
@@ -112,8 +110,6 @@ export async function GET(request: NextRequest) {
             }
         }
 
-        console.log(`📡 GET: Processed args:`, args);
-
         // Call the contract function
         const data = await publicClient.readContract({
             address: CONTRACT_ADDRESS,
@@ -121,8 +117,6 @@ export async function GET(request: NextRequest) {
             functionName: functionName as any,
             args: args as any,
         });
-
-        console.log(`✅ GET: Contract data:`, data);
 
         // Convert BigInt values to strings for JSON serialization
         const serializedData = JSON.parse(
@@ -136,12 +130,6 @@ export async function GET(request: NextRequest) {
             data: serializedData,
         });
     } catch (error: any) {
-        console.error('❌ GET: Contract read error:', error);
-        console.error('❌ GET: Error details:', {
-            message: error.message,
-            stack: error.stack,
-            name: error.name
-        });
         return NextResponse.json(
             {
                 success: false,
@@ -176,8 +164,6 @@ export async function POST(request: NextRequest) {
             });
         }
 
-        console.log(`📡 API: Reading contract function: ${functionName}`);
-        console.log(`📡 API: Args:`, processedArgs);
 
         // Call the contract function
         const data = await publicClient.readContract({
@@ -186,8 +172,6 @@ export async function POST(request: NextRequest) {
             functionName: functionName as any,
             args: processedArgs as any,
         });
-
-        console.log(`✅ API: Contract read successful:`, data);
 
         // Convert BigInt values to strings for JSON serialization
         const serializedData = JSON.parse(
@@ -201,7 +185,6 @@ export async function POST(request: NextRequest) {
             result: serializedData,
         });
     } catch (error: any) {
-        console.error('❌ API: Contract read error:', error);
         return NextResponse.json(
             {
                 success: false,

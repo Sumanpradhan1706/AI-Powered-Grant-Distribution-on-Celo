@@ -65,19 +65,18 @@ export default function ProjectLeaderboard() {
 
   // Log the contract read result
   useEffect(() => {
-    console.log('📡 useReadContract Results:');
-    console.log('  - isLoading:', isProjectIdsLoading);
-    console.log('  - isError:', isProjectIdsError);
-    console.log('  - error:', projectIdsError);
-    console.log('  - data:', userProjectIds);
-    console.log('  - data type:', typeof userProjectIds);
+
+
+
+
+
+
     console.log('  - data is array?', Array.isArray(userProjectIds));
   }, [userProjectIds, isProjectIdsError, projectIdsError, isProjectIdsLoading]);
 
   useEffect(() => {
-    console.log('🔍 ProjectLeaderboard - useEffect triggered');
-    console.log('Connected Address:', address);
-    console.log('User Project IDs:', userProjectIds);
+
+
 
     if (address) {
       fetchUserProjects();
@@ -88,13 +87,13 @@ export default function ProjectLeaderboard() {
   }, [address, userProjectIds]);
 
   const fetchUserProjects = async () => {
-    console.log('📊 Fetching user projects...');
-    console.log('Address:', address);
-    console.log('User Project IDs:', userProjectIds);
+
+
+
     console.log('Project IDs length:', userProjectIds ? (userProjectIds as any[]).length : 0);
 
     if (!address || !userProjectIds || (userProjectIds as any[]).length === 0) {
-      console.log('⚠️ No projects found for this address');
+
       console.log('Reasons: address?', !!address, 'userProjectIds?', !!userProjectIds, 'length:', userProjectIds ? (userProjectIds as any[]).length : 0);
       setProjects([]);
       setLoading(false);
@@ -106,8 +105,7 @@ export default function ProjectLeaderboard() {
       const projectIds = userProjectIds as bigint[];
       const fetchedProjects: Project[] = [];
 
-      console.log(`📥 Fetching ${projectIds.length} projects from blockchain...`);
-      console.log('Project IDs:', projectIds);
+
       console.log('Project IDs types:', projectIds.map(id => typeof id));
 
       // Fetch each project from blockchain
@@ -124,17 +122,12 @@ export default function ProjectLeaderboard() {
             }),
           });
 
-          console.log(`  - Response status: ${response.status}`);
-          console.log(`  - Response ok: ${response.ok}`);
 
           if (response.ok) {
             const data = await response.json();
-            console.log(`  - Response data:`, data);
 
             if (data.result) {
               const project = data.result as any; // API returns strings for BigInt values
-
-              console.log(`    ✅ Project ${projectId} fetched:`, project.name);
 
               // Convert string values back to appropriate types
               fetchedProjects.push({
@@ -169,7 +162,6 @@ export default function ProjectLeaderboard() {
         }
       }
 
-      console.log(`✅ Total projects fetched: ${fetchedProjects.length}`);
       setProjects(fetchedProjects);
     } catch (error) {
       console.error('Error fetching user projects:', error);
@@ -217,33 +209,6 @@ export default function ProjectLeaderboard() {
 
   return (
     <div className="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden">
-      {/* Debug Panel - Remove after testing */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="p-4 bg-blue-900/20 border-b border-blue-500/30">
-          <p className="font-bold text-blue-400 mb-2 text-sm">🔧 Debug Info:</p>
-          <div className="space-y-1 text-xs text-gray-300 font-mono">
-            <p>Contract Address: {CONTRACT_ADDRESS}</p>
-            <p>Connected Wallet: {address || 'Not connected'}</p>
-            <p>Project IDs Loading: {isProjectIdsLoading ? 'Yes' : 'No'}</p>
-            <p>Project IDs Error: {isProjectIdsError ? 'Yes - ' + projectIdsError?.message : 'No'}</p>
-            <p>User Project IDs (raw): {userProjectIds ? JSON.stringify(userProjectIds, (key, value) =>
-              typeof value === 'bigint' ? value.toString() : value
-            ) : 'None'}</p>
-            <p>User Project IDs (type): {typeof userProjectIds}</p>
-            <p>Is Array: {Array.isArray(userProjectIds) ? 'Yes' : 'No'}</p>
-            <p>Number of Projects: {userProjectIds ? (userProjectIds as any[]).length : 0}</p>
-            <p>Fetched Projects Count: {projects.length}</p>
-            <p>Loading State: {loading ? 'Yes' : 'No'}</p>
-            <p className="text-yellow-400 mt-2">
-              ⚠️ Expected Project Owner: 0x16eA3c33b1c24E96eeb0C8CCe92eC7C0736aaCCb
-            </p>
-            <p className={address === '0x16eA3c33b1c24E96eeb0C8CCe92eC7C0736aaCCb' ? 'text-green-400' : 'text-red-400'}>
-              {address === '0x16eA3c33b1c24E96eeb0C8CCe92eC7C0736aaCCb' ? '✅ Wallet matches!' : '❌ Wallet does NOT match!'}
-            </p>
-          </div>
-        </div>
-      )}
-
       <div className="p-6 border-b border-gray-700">
         <h2 className="text-2xl font-bold text-white flex items-center space-x-2">
           <TrendingUp className="w-6 h-6 text-blue-400" />

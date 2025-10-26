@@ -114,19 +114,17 @@ export default function ProjectsOverview() {
 
     // Load all projects
     const loadProjects = async () => {
-        console.log('Loading projects, count:', projectCount);
 
         if (projectCount === undefined) {
-            console.log('Project count is undefined, waiting...');
+
             setLoading(false);
             return;
         }
 
         const count = Number(projectCount);
-        console.log('Total projects on blockchain:', count);
 
         if (count === 0) {
-            console.log('No projects on blockchain yet');
+
             setProjects([]);
             setLoading(false);
             setRefreshing(false);
@@ -137,7 +135,7 @@ export default function ProjectsOverview() {
         setError(null);
 
         // First, get all companies for lookup
-        console.log('📋 Fetching all companies for name lookup...');
+
         const companiesMap = new Map<string, string>();
         try {
             const allCompaniesResponse = await fetch(
@@ -146,7 +144,6 @@ export default function ProjectsOverview() {
             const allCompaniesResult = await allCompaniesResponse.json();
             if (allCompaniesResult.success && allCompaniesResult.data) {
                 const companyAddresses = allCompaniesResult.data as string[];
-                console.log(`✅ Found ${companyAddresses.length} total companies`);
 
                 // Fetch each company's details using POST (more reliable for addresses)
                 for (const addr of companyAddresses) {
@@ -164,29 +161,27 @@ export default function ProjectsOverview() {
                             // result is [companyAddress, name, isActive, registeredAt]
                             const companyName = result.result[1];
                             companiesMap.set(addr.toLowerCase(), companyName);
-                            console.log(`  ✅ ${companyName}: ${addr}`);
+
                         }
                     } catch (err) {
-                        console.warn(`  ⚠️ Failed to fetch company ${addr}:`, err);
+
                     }
                 }
             }
         } catch (err) {
             console.error('❌ Failed to fetch companies list:', err);
         }
-        console.log('📊 Companies map:', companiesMap);
 
         const projectsData: ProjectData[] = [];
 
         for (let i = 0; i < count; i++) {
             try {
-                console.log(`Fetching project ${i}...`);
+
                 // Fetch project data
                 const response = await fetch(
                     `/api/contract/read?function=getProject&args=${i}`
                 );
                 const result = await response.json();
-                console.log(`Project ${i} response:`, result);
 
                 if (!result.success) {
                     console.error(`Failed to fetch project ${i}:`, result.error);
@@ -197,19 +192,18 @@ export default function ProjectsOverview() {
 
                 if (projectData) {
                     // Fetch assigned companies
-                    console.log(`📋 Fetching assigned companies for project ${i}...`);
+
                     const companiesResponse = await fetch(
                         `/api/contract/read?function=getProjectAssignedCompanies&args=${i}`
                     );
                     const companiesResult = await companiesResponse.json();
-                    console.log(`📋 Companies result for project ${i}:`, companiesResult);
+
                     const companyAddresses = companiesResult.data || [];
-                    console.log(`📋 Company addresses for project ${i}:`, companyAddresses);
 
                     // Map addresses to names using our pre-fetched map
                     const assignedCompanies: CompanyInfo[] = [];
                     if (companyAddresses && Array.isArray(companyAddresses) && companyAddresses.length > 0) {
-                        console.log(`👥 Mapping ${companyAddresses.length} company addresses to names...`);
+
                         for (const companyAddr of companyAddresses) {
                             const companyName = companiesMap.get(companyAddr.toLowerCase());
                             if (companyName) {
@@ -224,14 +218,13 @@ export default function ProjectsOverview() {
                                     address: companyAddr,
                                     name: `Company ${companyAddr.slice(0, 6)}...${companyAddr.slice(-4)}`,
                                 });
-                                console.warn(`  ⚠️ Company name not found for ${companyAddr}`);
+
                             }
                         }
                     } else {
-                        console.log(`⚠️ No companies assigned to project ${i}`);
+
                     }
 
-                    console.log(`📊 Final assigned companies for project ${i}:`, assignedCompanies);
                     projectsData.push({
                         ...projectData,
                         assignedCompanies,
@@ -243,7 +236,6 @@ export default function ProjectsOverview() {
             }
         }
 
-        console.log('Loaded projects:', projectsData);
         setProjects(projectsData);
         setLoading(false);
         setRefreshing(false);
@@ -251,7 +243,7 @@ export default function ProjectsOverview() {
 
     useEffect(() => {
         if (projectCount !== undefined) {
-            console.log('Project count changed:', projectCount);
+
             loadProjects();
         }
     }, [projectCount]);
@@ -365,17 +357,6 @@ export default function ProjectsOverview() {
                     <p className="text-gray-400 mb-4">
                         No projects have been submitted for grant funding.
                     </p>
-                    <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4 max-w-md mx-auto">
-                        <p className="text-sm text-blue-300">
-                            <strong>Debug Info:</strong>
-                        </p>
-                        <p className="text-xs text-gray-400 mt-2">
-                            Project Count: {projectCount !== undefined ? Number(projectCount).toString() : 'Loading...'}
-                        </p>
-                        <p className="text-xs text-gray-400">
-                            Contract: {CONTRACT_ADDRESS}
-                        </p>
-                    </div>
                     <button
                         onClick={handleRefresh}
                         className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center space-x-2 mx-auto"

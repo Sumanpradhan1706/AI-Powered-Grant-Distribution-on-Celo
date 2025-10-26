@@ -32,7 +32,7 @@ export default function AIScoreManager() {
     useEffect(() => {
         // When transaction is successful, update database and refresh projects
         if (isSuccess && hash) {
-            console.log('✅ Transaction confirmed:', hash);
+
             alert('✅ Score updated successfully on blockchain!\n\nTransaction: ' + hash);
             setUpdateError(null);
             setCurrentUpdatingProject(null);
@@ -191,20 +191,18 @@ export default function AIScoreManager() {
         if (project.blockchain_project_id !== null && project.blockchain_project_id !== undefined) {
             // Use the stored blockchain project ID (for new projects)
             blockchainProjectId = project.blockchain_project_id;
-            console.log('✅ Using stored blockchain_project_id:', blockchainProjectId);
+
         } else {
             // Fallback: Use database ID - 1 (for old projects registered before this fix)
             blockchainProjectId = projectId - 1;
-            console.log('⚠️ No blockchain_project_id found, using fallback:', blockchainProjectId);
+
             console.log('   (Database ID - 1)');
         }
 
-        console.log('📝 Updating score on blockchain...');
-        console.log('  Database Project ID:', projectId);
-        console.log('  Blockchain Project ID:', blockchainProjectId);
-        console.log('  New Score:', score);
-        console.log('  Contract:', CONTRACT_ADDRESS);
-        console.log('  From:', address);
+
+
+
+
 
         if (blockchainProjectId < 0) {
             alert('❌ Invalid blockchain project ID. Cannot update score.');
@@ -232,7 +230,6 @@ export default function AIScoreManager() {
                 args: [BigInt(blockchainProjectId), BigInt(score)],
             });
 
-            console.log('✅ Transaction sent! Waiting for confirmation...');
         } catch (error: any) {
             console.error('❌ Error calling writeContract:', error);
             alert('❌ Error initiating transaction:\n\n' + (error.message || 'Unknown error'));

@@ -36,14 +36,10 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        console.log(`📡 API: Fetching ${eventName} events from block ${fromBlock || 0} to ${toBlock || 'latest'}`);
-
         // Get current block number
         const currentBlock = await publicClient.getBlockNumber();
-        const from = fromBlock ? BigInt(fromBlock) : currentBlock - BigInt(10000); // Default: last ~10k blocks
-        const to = toBlock ? BigInt(toBlock) : currentBlock;
-
-        console.log(`📡 API: Block range: ${from} to ${to}`);
+        const from = fromBlock !== undefined && fromBlock !== null ? BigInt(fromBlock) : currentBlock - BigInt(10000); // Default: last ~10k blocks
+        const to = toBlock !== undefined && toBlock !== null ? BigInt(toBlock) : currentBlock;
 
         // Fetch events
         const eventAbi = parseAbiItem(EVENT_SIGNATURES[eventName as keyof typeof EVENT_SIGNATURES]);
@@ -54,8 +50,6 @@ export async function POST(request: NextRequest) {
             fromBlock: from,
             toBlock: to,
         });
-
-        console.log(`✅ API: Found ${logs.length} ${eventName} events`);
 
         // Convert BigInt values to strings for JSON serialization
         const serializedLogs = logs.map((log: any) => ({
@@ -75,7 +69,6 @@ export async function POST(request: NextRequest) {
             count: serializedLogs.length,
         });
     } catch (error: any) {
-        console.error('❌ API: Events fetch error:', error);
         return NextResponse.json(
             {
                 success: false,

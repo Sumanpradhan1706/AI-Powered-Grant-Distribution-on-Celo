@@ -69,15 +69,14 @@ export default function VotingPanel() {
         args: address ? [address] : undefined,
     });
 
-    // Debug logging for contract read
     useEffect(() => {
-        console.log('🔍 VotingPanel - Contract Read Debug:');
-        console.log('  Connected Address:', address);
-        console.log('  Is Loading Assignments:', isLoadingAssignments);
-        console.log('  Is Error:', isAssignmentsError);
-        console.log('  Error:', assignmentsError);
-        console.log('  Assigned Project IDs:', assignedProjectIds);
-        console.log('  Assigned Project IDs Type:', typeof assignedProjectIds);
+
+
+
+
+
+
+
         console.log('  Is Array?:', Array.isArray(assignedProjectIds));
     }, [address, assignedProjectIds, isLoadingAssignments, isAssignmentsError, assignmentsError]);
 
@@ -89,11 +88,10 @@ export default function VotingPanel() {
 
     const fetchProjects = async () => {
         try {
-            console.log('📊 Fetching assigned projects from blockchain...');
-            console.log('Assigned Project IDs:', assignedProjectIds);
+
 
             if (!assignedProjectIds || assignedProjectIds.length === 0) {
-                console.log('⚠️ No projects assigned to this company');
+
                 setProjects([]);
                 return;
             }
@@ -123,7 +121,6 @@ export default function VotingPanel() {
 
                     if (data.success && data.result) {
                         const project = data.result;
-                        console.log(`✅ Fetched project ${projectId}:`, project.name);
 
                         return {
                             id: typeof project.id === 'string' ? parseInt(project.id) : Number(project.id),
@@ -155,7 +152,6 @@ export default function VotingPanel() {
             const projectResults = await Promise.all(projectPromises);
             const validProjects = projectResults.filter((p): p is ProjectData => p !== null);
 
-            console.log(`✅ Successfully fetched ${validProjects.length} projects from blockchain`);
             setProjects(validProjects);
         } catch (error) {
             console.error('❌ Error fetching projects:', error);
@@ -167,7 +163,7 @@ export default function VotingPanel() {
         setAnalyzingProjectId(project.id);
         try {
             // First, fetch GitHub data
-            console.log('Fetching GitHub data for:', project.githubUrl);
+
             const githubResponse = await fetch('/api/github/fetch', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -194,14 +190,14 @@ export default function VotingPanel() {
                         forks: githubResult.data.forks || 0,
                         contributors: githubResult.data.contributors || 0,
                     };
-                    console.log('GitHub data fetched:', githubData);
+
                 }
             } else {
-                console.warn('GitHub fetch failed, using default values');
+
             }
 
             // Then, analyze with AI using the GitHub data
-            console.log('Analyzing project with AI...');
+
             const response = await fetch('/api/ai/score', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -217,7 +213,7 @@ export default function VotingPanel() {
 
             if (response.ok) {
                 const result = await response.json();
-                console.log('AI analysis result:', result);
+
                 setAiAnalysis(prev => ({
                     ...prev,
                     [project.id]: result.analysis
@@ -238,15 +234,14 @@ export default function VotingPanel() {
 
     const handleVote = useCallback(async (projectId: number, support: boolean, e?: React.MouseEvent) => {
         const timestamp = new Date().toISOString();
-        console.log(`\n========== VOTE ATTEMPT START [${timestamp}] ==========`);
-        console.log(`Project ID: ${projectId}`);
-        console.log(`Support: ${support}`);
-        console.log(`isVotingRef.current: ${isVotingRef.current}`);
-        console.log(`votingProjectId: ${votingProjectId}`);
+
+
+
+
 
         // Prevent any event propagation or default behavior
         if (e) {
-            console.log('Preventing event propagation and default');
+
             e.preventDefault();
             e.stopPropagation();
             // Stop immediately after preventDefault
@@ -255,33 +250,29 @@ export default function VotingPanel() {
 
         // Check ref first - this prevents React from calling the function multiple times
         if (isVotingRef.current) {
-            console.log('⚠️ BLOCKED: Already processing a vote via ref');
-            console.log(`========== VOTE ATTEMPT END [${timestamp}] ==========\n`);
+
+
             return;
         }
 
         // Prevent double voting using state
         if (votingProjectId !== null) {
-            console.log(`⚠️ BLOCKED: Already voting on project ${votingProjectId}`);
-            console.log(`========== VOTE ATTEMPT END [${timestamp}] ==========\n`);
+
+
             return;
         }
-
-        console.log(`🗳️ PROCEEDING with vote on project ${projectId} - Support: ${support}`);
 
         // Set ref to true immediately to prevent any duplicate calls
         isVotingRef.current = true;
         setVotingProjectId(projectId);
         setVotingSupport(support); // Store which button was clicked
-        console.log('Set isVotingRef.current = true');
-        console.log(`Set votingProjectId = ${projectId}`);
-        console.log(`Set votingSupport = ${support}`);
+
+
 
         try {
-            console.log(`\n📝 About to call writeContract:`);
-            console.log(`   - Contract Address: ${contractAddress}`);
-            console.log(`   - Function: voteOnProject`);
-            console.log(`   - Args: [${projectId}, ${support}]`);
+
+
+
 
             writeContract({
                 address: contractAddress,
@@ -300,23 +291,23 @@ export default function VotingPanel() {
                 functionName: 'voteOnProject',
                 args: [BigInt(projectId), support],
             });
-            console.log(`✅ writeContract called successfully for project ${projectId}`);
-            console.log(`========== VOTE ATTEMPT END [${timestamp}] ==========\n`);
+
+
         } catch (err) {
             console.error('❌ Error in writeContract:', err);
             setVotingProjectId(null);
             setVotingSupport(null);
             isVotingRef.current = false;
-            console.log(`========== VOTE ATTEMPT END [${timestamp}] ==========\n`);
+
         }
     }, [votingProjectId, writeContract, contractAddress]);    // Track writeContract state changes
     useEffect(() => {
-        console.log(`📊 writeContract state changed:`);
-        console.log(`   - isPending: ${isPending}`);
-        console.log(`   - isConfirming: ${isConfirming}`);
-        console.log(`   - isSuccess: ${isSuccess}`);
-        console.log(`   - isError: ${isError}`);
-        console.log(`   - hash: ${hash}`);
+
+
+
+
+
+
         if (error) {
             console.error(`   - error:`, error);
         }
@@ -324,7 +315,7 @@ export default function VotingPanel() {
 
     useEffect(() => {
         if (isSuccess) {
-            console.log('✅ Vote confirmed successfully, resetting state');
+
             fetchProjects();
             setVotingProjectId(null);
             setVotingSupport(null);
