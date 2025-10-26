@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
-import { Shield, Building2, AlertCircle, Wallet } from 'lucide-react';
+import { Shield, Building2, AlertCircle, Wallet, FolderGit2 } from 'lucide-react';
 import CompanyManager from './CompanyManager';
 import TreasuryManagerCELO from './TreasuryManagerCELO';
+import ProjectsOverview from './ProjectsOverview';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function AdminPanel() {
@@ -87,8 +88,12 @@ export default function AdminPanel() {
             </div>
 
             {/* Admin Content with Tabs */}
-            <Tabs defaultValue="treasury" className="space-y-6">
+            <Tabs defaultValue="overview" className="space-y-6">
                 <TabsList className="bg-gray-800/50 border border-gray-700">
+                    <TabsTrigger value="overview" className="data-[state=active]:bg-purple-600">
+                        <FolderGit2 className="w-4 h-4 mr-2" />
+                        Projects Overview
+                    </TabsTrigger>
                     <TabsTrigger value="treasury" className="data-[state=active]:bg-green-600">
                         <Wallet className="w-4 h-4 mr-2" />
                         Treasury
@@ -98,6 +103,10 @@ export default function AdminPanel() {
                         Companies & Projects
                     </TabsTrigger>
                 </TabsList>
+
+                <TabsContent value="overview">
+                    <ProjectsOverview />
+                </TabsContent>
 
                 <TabsContent value="treasury">
                     <TreasuryManagerCELO />

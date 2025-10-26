@@ -16,6 +16,7 @@ export default function CompanyManager() {
     const [selectedProjects, setSelectedProjects] = useState<number[]>([]);
     const [projects, setProjects] = useState<Project[]>([]);
     const [isAssigningProjects, setIsAssigningProjects] = useState(false);
+    const [loadingProjects, setLoadingProjects] = useState(false);
     const { address } = useAccount();
 
     const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
@@ -23,10 +24,17 @@ export default function CompanyManager() {
     const { data: hash, writeContract, isPending, isError, error, reset } = useWriteContract();
     const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
 
-    // Fetch projects on mount
+    // Fetch projects on mount and when company address changes
     useEffect(() => {
         fetchProjects();
     }, []);
+
+    // Refetch projects when company address is entered
+    useEffect(() => {
+        if (companyAddress && companyAddress.length === 42) {
+            fetchProjects();
+        }
+    }, [companyAddress]);
 
     // Reset form after successful registration
     useEffect(() => {
@@ -36,18 +44,77 @@ export default function CompanyManager() {
             setSelectedProjects([]);
             setIsAssigningProjects(false);
             reset();
+            // Refetch projects after registration
+            fetchProjects();
         }
     }, [isSuccess, reset]);
 
     const fetchProjects = async () => {
+        setLoadingProjects(true);
         try {
-            const response = await fetch('/api/projects');
-            if (response.ok) {
-                const data = await response.json();
-                setProjects(Array.isArray(data) ? data : (data.projects || []));
+            console.log('📊 Fetching all projects from blockchain...');
+
+            // First, get the total project count
+            const countResponse = await fetch('/api/contract/read', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    functionName: 'projectCount',
+                    args: [],
+                }),
+            });
+
+            if (!countResponse.ok) {
+                console.error('❌ Failed to fetch project count');
+                setProjects([]);
+                return;
             }
+
+            const countData = await countResponse.json();
+            const projectCount = countData.result ? parseInt(countData.result) : 0;
+
+            console.log(`✅ Total projects on blockchain: ${projectCount}`);
+
+            if (projectCount === 0) {
+                setProjects([]);
+                return;
+            }
+
+            // Fetch all projects
+            const projectPromises = [];
+            for (let i = 0; i < projectCount; i++) {
+                projectPromises.push(
+                    fetch('/api/contract/read', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            functionName: 'getProject',
+                            args: [i.toString()],
+                        }),
+                    }).then(res => res.json())
+                );
+            }
+
+            const projectResults = await Promise.all(projectPromises);
+
+            const fetchedProjects = projectResults
+                .filter(data => data.success && data.result)
+                .map((data) => {
+                    const project = data.result;
+                    return {
+                        id: typeof project.id === 'string' ? parseInt(project.id) : Number(project.id),
+                        name: project.name || 'Unnamed Project',
+                        description: project.description || 'No description',
+                    };
+                });
+
+            console.log(`✅ Fetched ${fetchedProjects.length} projects from blockchain`);
+            setProjects(fetchedProjects);
         } catch (err) {
-            console.error('Error fetching projects:', err);
+            console.error('❌ Error fetching projects:', err);
+            setProjects([]);
+        } finally {
+            setLoadingProjects(false);
         }
     };
 
@@ -195,13 +262,26 @@ export default function CompanyManager() {
                                 <Link className="w-5 h-5 mr-2 text-purple-400" />
                                 Assign Projects to This Company
                             </h4>
-                            <span className="text-sm text-gray-400">
-                                {selectedProjects.length} selected
-                            </span>
+                            <div className="flex items-center space-x-3">
+                                {loadingProjects && (
+                                    <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
+                                )}
+                                <span className="text-sm text-gray-400">
+                                    {selectedProjects.length} selected
+                                </span>
+                            </div>
                         </div>
 
-                        {projects.length > 0 ? (
+                        {loadingProjects ? (
+                            <div className="flex items-center justify-center py-8 text-gray-400">
+                                <Loader2 className="w-6 h-6 mr-2 animate-spin" />
+                                <span>Loading projects from blockchain...</span>
+                            </div>
+                        ) : projects.length > 0 ? (
                             <>
+                                <div className="mb-2 text-sm text-gray-400">
+                                    Found {projects.length} project{projects.length !== 1 ? 's' : ''} on blockchain
+                                </div>
                                 <div className="space-y-2 max-h-64 overflow-y-auto mb-4 pr-2">
                                     {projects.map((project) => (
                                         <label
@@ -246,9 +326,9 @@ export default function CompanyManager() {
                                 </button>
                             </>
                         ) : (
-                            <div className="text-center py-8 text-gray-400">
-                                <p>No projects available yet</p>
-                                <p className="text-sm mt-2">Projects will appear here once they are submitted</p>
+                            <div className="text-center py-8 bg-gray-900/30 rounded-lg border border-gray-700">
+                                <p className="text-gray-400 mb-2">No projects available on blockchain yet</p>
+                                <p className="text-sm text-gray-500">Projects will appear here once they are submitted for grants</p>
                             </div>
                         )}
                     </div>
