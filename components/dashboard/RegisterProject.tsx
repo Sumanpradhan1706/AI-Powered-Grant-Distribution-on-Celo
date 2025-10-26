@@ -16,6 +16,7 @@ export default function RegisterProject() {
     name: '',
     description: '',
     githubUrl: '',
+    requestedAmount: '',
   });
 
   const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
@@ -68,8 +69,11 @@ export default function RegisterProject() {
       }
 
       // Step 3: Register project on blockchain FIRST
-      toast.info('Registering project on blockchain...');
+      toast.info('Proposing project on blockchain...');
       toast.info('Please confirm the transaction in your wallet');
+
+      // Convert requested amount to wei (CELO has 18 decimals)
+      const requestedAmountWei = BigInt(Math.floor(parseFloat(formData.requestedAmount) * 1e18));
 
       const txHash = await writeContract(config, {
         address: CONTRACT_ADDRESS,
@@ -79,15 +83,16 @@ export default function RegisterProject() {
               { name: '_name', type: 'string' },
               { name: '_description', type: 'string' },
               { name: '_githubUrl', type: 'string' },
+              { name: '_requestedAmount', type: 'uint256' },
             ],
-            name: 'registerProject',
+            name: 'proposeProject',
             outputs: [{ name: '', type: 'uint256' }],
             stateMutability: 'nonpayable',
             type: 'function',
           },
         ],
-        functionName: 'registerProject',
-        args: [formData.name, formData.description, formData.githubUrl],
+        functionName: 'proposeProject',
+        args: [formData.name, formData.description, formData.githubUrl, requestedAmountWei],
       });
 
       toast.info('Waiting for blockchain confirmation...');
@@ -107,13 +112,13 @@ export default function RegisterProject() {
       let blockchainProjectId = null;
 
       try {
-        // The ProjectRegistered event emits the projectId as the first indexed parameter
-        // Event signature: ProjectRegistered(uint256 indexed projectId, address indexed projectAddress, string name, uint256 timestamp)
-        const projectRegisteredTopic = '0x4d09c5613250bf0fe49cf0253146f4e1c4c1a45c49218a5363f69c7f53a4b3a9'; // keccak256("ProjectRegistered(uint256,address,string,uint256)")
+        // The ProjectProposed event emits the projectId as the first indexed parameter
+        // Event signature: ProjectProposed(uint256 indexed projectId, address indexed projectAddress, string name, uint256 requestedAmount, uint256 timestamp)
+        const projectProposedTopic = '0x' + require('crypto').createHash('sha256').update('ProjectProposed(uint256,address,string,uint256,uint256)').digest('hex').slice(0, 8);
 
-        const log = receipt.logs.find((log: any) => log.topics[0] === projectRegisteredTopic);
+        const log = receipt.logs.find((log: any) => log.topics && log.topics.length > 0);
 
-        if (log && log.topics[1]) {
+        if (log && log.topics && log.topics[1]) {
           // The project ID is in topics[1] (first indexed parameter after event signature)
           blockchainProjectId = parseInt(log.topics[1], 16);
           console.log('Blockchain Project ID:', blockchainProjectId);
@@ -134,6 +139,7 @@ export default function RegisterProject() {
           name: formData.name,
           description: formData.description,
           githubUrl: formData.githubUrl,
+          requestedAmount: formData.requestedAmount,
           blockchainTxHash: txHash,
           blockchainProjectId: blockchainProjectId,
           aiScore: aiData.score || 0,
@@ -145,9 +151,9 @@ export default function RegisterProject() {
         throw new Error(projectData.error || 'Failed to save to database');
       }
 
-      toast.success('🎉 Project registered successfully!');
+      toast.success('🎉 Project proposed successfully!');
       toast.success(`View on CeloScan: https://alfajores.celoscan.io/tx/${txHash}`);
-      setFormData({ name: '', description: '', githubUrl: '' });
+      setFormData({ name: '', description: '', githubUrl: '', requestedAmount: '' });
     } catch (error: any) {
       console.error('Registration Error:', error);
 
@@ -233,6 +239,25 @@ export default function RegisterProject() {
             className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="https://github.com/username/repo"
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">
+            Requested Grant Amount (CELO)
+          </label>
+          <input
+            type="number"
+            required
+            min="0.1"
+            step="0.1"
+            value={formData.requestedAmount}
+            onChange={(e) => setFormData({ ...formData, requestedAmount: e.target.value })}
+            className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="e.g., 100"
+          />
+          <p className="mt-1 text-sm text-gray-400">
+            Specify how much CELO funding you're requesting for your project
+          </p>
         </div>
 
         <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">

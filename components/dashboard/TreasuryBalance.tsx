@@ -6,7 +6,6 @@ import { formatEther } from 'viem';
 import { DollarSign, TrendingUp, Users, Wallet } from 'lucide-react';
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
-const cUSD_ADDRESS = '0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1'; // Celo Alfajores cUSD
 
 export default function TreasuryBalance() {
   const { data: balance } = useReadContract({
@@ -23,7 +22,7 @@ export default function TreasuryBalance() {
     functionName: 'getTreasuryBalance',
   });
 
-  const balanceInCUSD = balance ? parseFloat(formatEther(balance as bigint)) : 0;
+  const balanceInCELO = balance ? parseFloat(formatEther(balance as bigint)) : 0;
 
   // Fetch real stats from contract
   const { data: totalDistributed } = useReadContract({
@@ -66,9 +65,9 @@ export default function TreasuryBalance() {
           </div>
         </div>
         <div className="text-3xl font-bold text-white mb-1">
-          ${balanceInCUSD.toFixed(2)}
+          {balanceInCELO.toFixed(2)} CELO
         </div>
-        <div className="text-sm text-gray-400">Treasury Balance (cUSD)</div>
+        <div className="text-sm text-gray-400">Treasury Balance (CELO)</div>
       </div>
 
       <div className="bg-gradient-to-br from-green-900/50 to-green-800/30 rounded-xl p-6 border border-green-500/30">
@@ -78,7 +77,7 @@ export default function TreasuryBalance() {
           </div>
         </div>
         <div className="text-3xl font-bold text-white mb-1">
-          ${totalDistributedUSD.toFixed(2)}
+          {totalDistributedUSD.toFixed(2)} CELO
         </div>
         <div className="text-sm text-gray-400">Total Distributed</div>
       </div>
