@@ -34,10 +34,6 @@ const config: HardhatUserConfig = {
     cache: "./cache",
     artifacts: "./artifacts",
   },
-  typechain: {
-    outDir: "typechain-types",
-    target: "ethers-v6",
-  },
 };
 
 export default config;
